@@ -412,6 +412,44 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
   border:0;border-radius:4px;background:#231a12;color:#f5ece0;cursor:pointer}
 #setupbar .x{background:transparent;color:#5d4f42;text-decoration:underline}
 .hidechk{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.05em;cursor:pointer;white-space:nowrap}
+
+/* ---------- the cart ---------- */
+.navcart{display:none;font-family:"Special Elite",Courier,monospace;font-size:11.5px;letter-spacing:.06em;
+  background:var(--amber);color:var(--ground);border:0;border-radius:2px;padding:6px 11px;cursor:pointer;font-weight:700}
+.navcart.on{display:inline-block}
+.navcart.bump{animation:cartbump .45s ease}
+@keyframes cartbump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
+.cartwrap{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:70;display:none;justify-content:flex-end}
+.cartwrap.show{display:flex}
+.cartpane{background:var(--surface);border-left:1px solid var(--line);width:min(430px,100%);
+  height:100%;display:flex;flex-direction:column;box-shadow:-14px 0 40px rgba(0,0,0,.5)}
+.carthead{display:flex;align-items:baseline;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.carthead h3{margin:0;font-size:15px;letter-spacing:.05em}
+.carthead .cnt{font-family:"Special Elite",Courier,monospace;color:var(--faint);font-size:12px}
+.carthead .x{margin-left:auto;background:none;border:0;color:var(--dim);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.cartlist{flex:1;overflow-y:auto;padding:8px 10px}
+.cartrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:11px 10px;border-bottom:1px solid var(--line)}
+.cartrow .ct{font-weight:700;font-size:14px;line-height:1.35}
+.cartrow .cy{grid-column:1;font-family:"Special Elite",Courier,monospace;color:var(--faint);font-size:11.5px}
+.cartrow .rm{grid-column:2;grid-row:1/span 2;justify-self:end;background:none;border:1px solid var(--line);
+  border-radius:3px;color:var(--dim);font-size:10.5px;letter-spacing:.06em;padding:5px 8px;cursor:pointer;
+  align-self:center;white-space:nowrap}
+.cartrow .ct{grid-column:1;grid-row:1}
+.cartrow .setflag{grid-column:1;font-family:"Special Elite",Courier,monospace;color:var(--amber-dim);
+  font-size:10px;letter-spacing:.07em}
+.cartrow .rm:hover{border-color:var(--amber-dim);color:var(--amber)}
+.cartwarn{grid-column:1/-1;font-size:11.5px;line-height:1.45;border-radius:3px;padding:6px 8px;margin-top:3px}
+.cartwarn.red{background:rgba(190,60,50,.16);color:#f0b4ac}
+.cartwarn.amber{background:rgba(217,164,65,.14);color:#e6c98d}
+.cartfoot{border-top:1px solid var(--line);padding:14px 18px 18px;display:flex;flex-direction:column;gap:9px}
+.cartfoot .go{background:var(--amber);color:var(--ground);border:0;border-radius:2px;padding:13px;
+  font-family:"Special Elite",Courier,monospace;font-size:13px;letter-spacing:.07em;font-weight:700;cursor:pointer}
+.cartfoot .clr{background:none;border:0;color:var(--faint);font-size:11.5px;text-decoration:underline;cursor:pointer}
+.cartempty{padding:30px 18px;color:var(--faint);font-size:13px;line-height:1.6;text-align:center}
+.justone{background:none;border:0;color:var(--faint);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:4px 0}
+#slipclear{display:none;margin-top:10px;font-size:11.5px;color:var(--faint)}
+#slipclear.on{display:block}
+#slipclear button{background:none;border:0;color:var(--amber);text-decoration:underline;cursor:pointer;font-size:11.5px}
 </style>
 
 <div class="door" id="door">
@@ -510,6 +548,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="4.4"></circle><path d="M9.4 9.4L13 13" stroke-linecap="round"></path></svg>
     SEARCH
   </button>
+  <button class="navcart" id="navcart" title="Your cart">CART <span id="cartn">0</span></button>
 </nav>
 <div class="wrap">
 <header>
@@ -614,13 +653,27 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <p class="jb" id="tcjeffbody"></p>
     </div>
     <div class="acts">
-      <button class="rent" id="tcrent">REQUEST THIS TITLE</button>
+      <button class="rent" id="tcrent">ADD TO CART</button>
       <button class="ghost" id="tcask">ASK ABOUT THIS TITLE</button>
     </div>
+    <button class="justone" id="tcjustone">or ask for just this one, on its own slip &rarr;</button>
     <a class="tcfix" id="tcfix" href="#">box art wrong? report what your copy actually is &rarr;</a>
   </div>
 </div>
 
+<div class="cartwrap" id="cartwrap" role="dialog" aria-modal="true" aria-label="Your cart">
+  <div class="cartpane">
+    <div class="carthead">
+      <h3>YOUR CART</h3><span class="cnt" id="cartcnt"></span>
+      <button class="x" id="cartx" aria-label="Close cart">&times;</button>
+    </div>
+    <div class="cartlist" id="cartlist"></div>
+    <div class="cartfoot">
+      <button class="go" id="cartgo">REQUEST THESE &rarr;</button>
+      <button class="clr" id="cartclr">empty the cart</button>
+    </div>
+  </div>
+</div>
 <div class="slipwrap" id="slipwrap" role="dialog" aria-modal="true" aria-label="Store slip">
   <div class="slip">
     <h3 id="sliphead">RENTAL REQUEST SLIP</h3>
@@ -645,6 +698,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <label for="slipnote">NOTE TO THE MANAGEMENT (optional)</label>
       <textarea id="slipnote" placeholder="optional"></textarea>
     </div>
+    <p id="slipclear">Sent it? <button type="button" id="slipclearbtn">Empty the cart</button></p>
     <div id="qfields" style="display:none">
       <label for="slipq">YOUR QUESTION</label>
       <textarea id="slipq" placeholder="what do you want to know"></textarea>
@@ -1645,7 +1699,7 @@ function rowHTML(d){
     '<span class="yr">'+esc(d.year)+'</span><span class="dir">'+esc(d.dir)+'</span>'+
     (d.pub?'<span class="lab">'+esc(d.pub)+'</span>':"")+
     '<span class="row-badges">'+badges(d)+'</span><span class="spacer"></span>'+
-    '<button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">REQUEST</button></div>';
+    '<button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">ADD</button></div>';
 }
 function vhsHTML(d,blurb){
   var cv=coverSrc(d);
@@ -1654,7 +1708,7 @@ function vhsHTML(d,blurb){
     '<span class="m">'+esc(d.year)+' &middot; '+esc(d.dir)+'</span>'+
     '<span class="rb">'+badges(d)+'</span>'+
     (blurb?'<span class="b">'+esc(blurb)+'</span>':"")+'</div>'+
-    '<button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">REQUEST</button></div>';
+    '<button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">ADD</button></div>';
 }
 function findFilm(t,dir){
   var k=FILMS.filter(function(d){return d.movie===t&&(!dir||d.dir===dir);});
@@ -1725,7 +1779,7 @@ var OUTSET={};(LEDGER.out||[]).forEach(function(o){if(o.title)OUTSET[o.title.rep
       '<span class="m">'+esc([d.year,d.dir,d.pub].filter(Boolean).join(" · "))+'</span>'+
       '<span class="rb">'+badges(d)+'</span>'+
       (desc?'<span class="d">'+esc(desc)+'</span>':'<span class="d pend">Card pending. Ask Jeff about this one.</span>')+playWhy(d)+
-      '<div class="acts2"><button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">REQUEST</button>'+
+      '<div class="acts2"><button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">ADD</button>'+
       '<button class="full">FULL CARD</button></div>'+
       '<a class="fix" href="'+fixmail+'">wrong art? tell the management</a>'+
       '</div></div>';
@@ -1806,7 +1860,7 @@ function renderFloor(){
         '<span class="m">'+films.length+' FILMS · RENTS COMPLETE</span>'+
         '<span class="films">'+esc(shown)+'</span>'+
         '<span class="more">see what\'s in the box &rarr;</span>'+
-        '<button class="rent" data-film="'+esc(s)+' [complete box set]" data-year="'+films.length+' films">REQUEST SET</button></div>';
+        '<button class="rent" data-film="'+esc(s)+' [complete box set]" data-year="'+films.length+' films">ADD SET</button></div>';
     }).join("")+'</div>';
     document.getElementById('fcount').textContent=names.length+" box sets";
     return;
@@ -1886,7 +1940,8 @@ function openTitle(name,year){
   currentTitle=d; currentSet=null;
   document.getElementById('tcfilms').style.display="none";
   document.getElementById('tcfix').style.display="";
-  document.getElementById('tcrent').textContent="REQUEST THIS TITLE";
+  document.getElementById('tcrent').textContent="ADD TO CART";
+  document.getElementById('tcjustone').textContent="or ask for just this one, on its own slip \u2192";
   document.getElementById('tcask').textContent="ASK ABOUT THIS TITLE";
   var ci=document.getElementById('tccover'),cv=coverSrc(d);
   if(cv){ci.src=cv;ci.style.display="";}else{ci.removeAttribute('src');ci.style.display="none";}
@@ -1936,7 +1991,8 @@ function openSet(name){
   var fl=document.getElementById('tcfilms');
   fl.innerHTML='<p class="setlab">WHAT’S IN THE BOX &middot; tap any title for its own card</p>'+rows;
   fl.style.display="block";
-  document.getElementById('tcrent').textContent="REQUEST THE WHOLE SET";
+  document.getElementById('tcrent').textContent="ADD THE WHOLE SET";
+  document.getElementById('tcjustone').textContent="or ask for just this set, on its own slip \u2192";
   document.getElementById('tcask').textContent="ASK ABOUT THIS SET";
   document.getElementById('titlewrap').classList.add('show');
   document.querySelector('.titlecard').scrollTop=0;
@@ -1949,19 +2005,115 @@ function setSlipArgs(){
   if(currentTitle)return[currentTitle.movie,currentTitle.year];
   return null;
 }
-document.getElementById('tcrent').addEventListener('click',function(){
+document.getElementById('tcrent').addEventListener('click',function(e){
+  var a=setSlipArgs(); if(a)addToCart(a[0],a[1],e.currentTarget);
+});
+document.getElementById('tcjustone').addEventListener('click',function(){
   var a=setSlipArgs(); if(a){closeTitle();openSlip('request',a[0],a[1]);}
 });
 document.getElementById('tcask').addEventListener('click',function(){
   var a=setSlipArgs(); if(a){closeTitle();openSlip('question',a[0],a[1]);}
 });
 
+/* ---------- the cart ----------
+   One trip, one slip, one email. Every ADD lands here; checkout hands the whole
+   list to openSlip() in cart mode. The QUESTION path is deliberately untouched
+   and still one title at a time - a question is about a disc, not about a trip. */
+var CART=[];
+function cartKey(){var P=TVprofile();return 'tv-cart'+(P&&P.name?'::'+P.name.toLowerCase():'');}
+function cartLoad(){try{CART=JSON.parse(localStorage.getItem(cartKey())||'[]')||[];}catch(e){CART=[];}
+  if(!Array.isArray(CART))CART=[];}
+function cartSave(){try{localStorage.setItem(cartKey(),JSON.stringify(CART));}catch(e){}}
+function inCart(t,y){for(var i=0;i<CART.length;i++){if(CART[i].t===t&&CART[i].y===String(y))return i;}return -1;}
+function updateCartBtn(){
+  var b=document.getElementById('navcart');
+  if(!b)return;
+  document.getElementById('cartn').textContent=CART.length;
+  b.classList.toggle('on',CART.length>0);
+}
+function addToCart(t,y,btn){
+  if(!t)return;
+  y=String(y==null?"":y);
+  if(inCart(t,y)<0){ CART.push({t:t,y:y}); cartSave(); }
+  updateCartBtn();
+  var b=document.getElementById('navcart');
+  if(b){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}
+  if(btn){ var was=btn.getAttribute('data-was')||btn.textContent;
+    btn.setAttribute('data-was',was); btn.textContent="IN THE CART";
+    setTimeout(function(){btn.textContent=was;},1400); }
+  if(document.getElementById('cartwrap').classList.contains('show'))renderCart();
+}
+function removeFromCart(i){ CART.splice(i,1); cartSave(); updateCartBtn(); renderCart(); }
+function cartClear(){ CART=[]; cartSave(); updateCartBtn(); renderCart(); }
+/* a cart line's playability, so a disc that won't play can't be checked out silently */
+function cartWarnFor(it){
+  var P=TVprofile(); if(!P)return null;
+  var m=/^(.*) \[complete box set\]$/.exec(it.t);
+  if(m){
+    var films=sets[m[1]]||[],bad=0,amb=0;
+    films.forEach(function(d){var r=playFor(d)||canPlay(d,P); if(!r)return;
+      if(r.v==="red")bad++; else if(r.v==="amber")amb++;});
+    if(bad)return{v:"red",why:bad+" of the "+films.length+" discs in this box won't play on your setup, and the box only goes out complete."};
+    if(amb)return{v:"amber",why:amb+" disc"+(amb>1?"s":"")+" in this box carries a caveat - open the box's card for the detail."};
+    return null;
+  }
+  var d=FILMS.filter(function(x){return x.movie===it.t&&(!it.y||x.year===it.y);})[0]||findFilm(it.t);
+  if(!d)return null;
+  var r=playFor(d)||canPlay(d,P);
+  if(!r||r.v==="green")return null;
+  return r;
+}
+function renderCart(){
+  var L=document.getElementById('cartlist');
+  document.getElementById('cartcnt').textContent=CART.length?CART.length+(CART.length===1?" title":" titles"):"";
+  if(!CART.length){
+    L.innerHTML='<p class="cartempty">Nothing in the cart yet.<br>Add anything off the floor and ask for it all in one go.</p>';
+    document.getElementById('cartgo').style.display="none";
+    document.getElementById('cartclr').style.display="none";
+    return;
+  }
+  document.getElementById('cartgo').style.display="";
+  document.getElementById('cartclr').style.display="";
+  L.innerHTML=CART.map(function(it,i){
+    var w=cartWarnFor(it), m=/^(.*) \[complete box set\]$/.exec(it.t);
+    return '<div class="cartrow"><span class="ct">'+esc(m?m[1]:it.t)+'</span>'+
+      '<button class="rm" data-i="'+i+'">REMOVE</button>'+
+      (m?'<span class="setflag">COMPLETE BOX SET</span>':'')+
+      '<span class="cy">'+esc(it.y||"")+'</span>'+
+      (w?'<div class="cartwarn '+w.v+'">'+esc(w.why)+'</div>':'')+'</div>';
+  }).join("");
+}
+function openCart(){ renderCart(); document.getElementById('cartwrap').classList.add('show'); }
+function closeCart(){ document.getElementById('cartwrap').classList.remove('show'); }
+(function(){
+  cartLoad(); updateCartBtn();
+  document.getElementById('navcart').addEventListener('click',openCart);
+  document.getElementById('cartx').addEventListener('click',closeCart);
+  document.getElementById('cartwrap').addEventListener('click',function(e){if(e.target===this)closeCart();});
+  document.getElementById('cartlist').addEventListener('click',function(e){
+    var r=e.target.closest?e.target.closest('.rm[data-i]'):null;
+    if(r)removeFromCart(parseInt(r.getAttribute('data-i'),10));
+  });
+  document.getElementById('cartclr').addEventListener('click',cartClear);
+  document.getElementById('cartgo').addEventListener('click',function(){ closeCart(); openSlip('request'); });
+  document.getElementById('slipclearbtn').addEventListener('click',function(){
+    cartClear(); document.getElementById('slipwrap').classList.remove('show');
+  });
+})();
+
 /* ---------- slip (request + question) ---------- */
 var slipMode='request',slipFilm=null;
+function slipItems(){ return slipFilm?[slipFilm]:CART.slice(); }
 function openSlip(mode,t,y){
-  slipMode=mode;slipFilm=t?{t:t,y:y}:null;
+  slipMode=mode;slipFilm=t?{t:t,y:String(y==null?"":y)}:null;
   document.getElementById('sliphead').textContent=mode==='request'?"RENTAL REQUEST SLIP":"QUESTION FOR THE MANAGEMENT";
-  document.getElementById('slipfilm').textContent=slipFilm?slipFilm.t+" ("+slipFilm.y+")":"General inquiry";
+  var items=slipItems();
+  document.getElementById('slipfilm').textContent=
+    mode==='question' ? (slipFilm?slipFilm.t+" ("+slipFilm.y+")":"General inquiry")
+    : (slipFilm ? slipFilm.t+" ("+slipFilm.y+")"
+       : items.length ? items.length+(items.length===1?" title":" titles")+" \u2014 "+items.map(function(x){return x.t;}).join(", ")
+       : "Nothing in the cart yet");
+  document.getElementById('slipclear').classList.toggle('on', mode==='request' && !slipFilm && items.length>0);
   document.getElementById('reqfields').style.display=mode==='request'?"block":"none";
   document.getElementById('qfields').style.display=mode==='question'?"block":"none";
   document.getElementById('slipcopy').textContent="COPY THE SLIP";
@@ -1976,15 +2128,22 @@ function slipText(){
     var handoff=document.getElementById('handoff').value;
     var howlong=document.getElementById('howlong').value;
     var note=document.getElementById('slipnote').value.trim();
+    var items=slipItems();
+    var lines=items.map(function(it,i){return "  "+(i+1)+". "+it.t+(it.y?" ("+it.y+")":"");}).join("\n");
+    var flags=items.map(function(it){var w=cartWarnFor(it);
+        return w?"  ! "+it.t+" — "+w.why:null;}).filter(Boolean).join("\n");
     return {
-      subject:"RENTAL REQUEST — "+(slipFilm?slipFilm.t+" ("+slipFilm.y+")":""),
+      subject:"RENTAL REQUEST — "+(items.length===1?items[0].t+(items[0].y?" ("+items[0].y+")":"")
+              :items.length+" titles"),
       body:"THEREAFTER VIDEO — RENTAL REQUEST SLIP\n"+
         "--------------------------------------\n"+
-        "TITLE:   "+(slipFilm?slipFilm.t+" ("+slipFilm.y+")":"")+"\n"+
+        (items.length===1?"TITLE:   "+items[0].t+(items[0].y?" ("+items[0].y+")":"")+"\n"
+                         :"TITLES ("+items.length+"):\n"+lines+"\n")+
         "MEMBER:  "+name+"\n"+
         "PICKUP:  "+handoff+"\n"+
         "HOW LONG: "+howlong+"\n"+
         (note?"NOTE:    "+note+"\n":"")+
+        (flags?"\nHEADS UP — the floor flagged these against my setup:\n"+flags+"\n":"")+
         "--------------------------------------\n"};
   }
   var qq=document.getElementById('slipq').value.trim();
@@ -2080,7 +2239,7 @@ document.addEventListener('click',function(e){
      this generic one must not fire for them or it re-opens the slip with no title */
   var b=e.target.closest?e.target.closest('.rent'):null;
   if(b&&b.closest('.titlecard'))return;
-  if(b){e.stopPropagation();openSlip('request',b.getAttribute('data-film'),b.getAttribute('data-year'));return;}
+  if(b){e.stopPropagation();addToCart(b.getAttribute('data-film'),b.getAttribute('data-year'),b);return;}
   var fx=e.target.closest?e.target.closest('.cbox a.fix'):null;
   if(fx){return;}
   var fb=e.target.closest?e.target.closest('.cbox .full'):null;
