@@ -11,6 +11,7 @@
   --paper:#e5dcc8; --paper-ink:#2b2620;
 }
 *{box-sizing:border-box}
+html:has(body.doorshut),body.doorshut{overflow:hidden;height:100%}
 body{background:var(--ground);color:var(--ink);margin:0;
   font:16px/1.55 Archivo,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
 .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
@@ -252,10 +253,10 @@ h2 .tick{color:var(--amber)}
   background:radial-gradient(ellipse at 50% 28%,transparent 55%,rgba(10,7,4,.5) 100%)}
 
 /* ---------- front door ---------- */
-.door{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;
+.door{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;
   background:repeating-linear-gradient(90deg,#2b2119 0 6px,#241b14 6px 130px,#1d150f 130px 136px)}
 .door.open{display:none}
-.doorcard{max-width:430px;width:100%;text-align:center;max-height:calc(100vh - 40px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.doorcard{max-width:430px;width:100%;text-align:center;margin:auto}
 .doorplate{background:var(--amber);color:var(--ground);transform:skewX(-8deg);padding:15px 26px 12px;
   box-shadow:6px 6px 0 #0b0906;display:inline-block;margin-bottom:22px}
 .doorplate .l1{font-family:"Archivo Black",Archivo,sans-serif;font-size:clamp(24px,7vw,38px);line-height:1;transform:skewX(8deg)}
@@ -1257,11 +1258,13 @@ var CONFIG=JSON.parse(document.getElementById('config').textContent);
   var want=tokenFor(norm(PW));
   try{
     if(localStorage.getItem('tv-door')===want){
-      if(TVprofile()){door.classList.add('open');}else{door.classList.remove('open');TVdoorWho();}
+      if(TVprofile()){door.classList.add('open');}
+      else{door.classList.remove('open');try{document.body.classList.add('doorshut');}catch(e){}TVdoorWho();}
       return;}
     localStorage.removeItem('tv-door');
   }catch(e){}
   door.classList.remove('open');
+  try{document.body.classList.add('doorshut');}catch(e){}
   var inp=document.getElementById('doorpw');
   setTimeout(function(){try{inp.focus();}catch(e){}},60);
   var misses=0;
@@ -1451,6 +1454,7 @@ function TVpick(name){
 }
 function TVenter(){
   document.getElementById('door').classList.add('open');
+  try{document.body.classList.remove('doorshut');}catch(e){}
   try{var p=TVprofile();if(p&&p.name)document.getElementById('memname').value=p.name;}catch(e){}
   if(typeof repaintPlay==='function')repaintPlay();
   if(typeof renderFloor==='function')renderFloor();
