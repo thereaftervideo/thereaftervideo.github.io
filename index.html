@@ -177,6 +177,8 @@ h2 .tick{color:var(--amber)}
   border:1px solid var(--line);border-radius:2px;padding:1px 6px;margin-top:2px}
 .cfront .ontag{position:absolute;top:6px;right:6px;transform:rotate(4deg);background:var(--red);color:#fff;
   font-family:"Special Elite",Courier,monospace;font-size:9.5px;padding:1px 7px;letter-spacing:.05em;border-radius:2px}
+/* one of several copies lent: the film is still gettable, so amber, not red */
+.cfront .ontag.part{background:var(--amber);color:var(--ground);font-weight:700}
 .cback{transform:rotateY(180deg);background:var(--paper);color:var(--paper-ink);display:flex;flex-direction:column;
   gap:5px;padding:10px 11px 8px;font-family:"Special Elite",Courier,monospace;
   overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -1629,7 +1631,10 @@ function playFor(d){
   var P=TVprofile(); if(!P)return null;
   var copies=(d.allcopies&&d.allcopies.length?d.allcopies:[d]),i,best=null,bestR=null;
   var rank={UHD:3,"Blu Ray":2,DVD:1};
+  /* a lent disc is not a disc you can be offered - skip it before choosing */
+  var lent=outInfo(d).taken;
   for(i=0;i<copies.length;i++){
+    if(lent[i])continue;
     var r=canPlay(copies[i],P);
     if(!r)continue;
     var better = !bestR || (bestR.v==="red"&&r.v!=="red") ||
@@ -1772,7 +1777,65 @@ function fixMail(d){
       "WHAT THE ACTUAL BOX IS (edition, label, format):  \n"+
       "--------------------------------------\n");
 }
-var OUTSET={};(LEDGER.out||[]).forEach(function(o){if(o.title)OUTSET[o.title.replace(/\s*\(\d{4}\)\s*$/,"")]=1;});
+/* ---------- what is out, at the level of a COPY ----------
+   A film can own several discs - a standalone plus one locked inside a box set,
+   or two editions of the same title. Lending one must not make the others read
+   as unavailable, and it must not make a DIFFERENT film with the same name read
+   as unavailable either (Bergman's Dreams vs Kurosawa's Dreams).
+   So the index is keyed on title+year and holds one entry per lent disc. */
+/* Built lazily behind a FUNCTION, not held in a `var`: the Manager's Shelf
+   renders further up this file and reaches playFor() -> outInfo(), and a `var`
+   assigned down here is still undefined at that point. Same trap as omenFor().
+   Rule for this template: anything reachable from earlier code is a function. */
+var _OUTIDX=null;
+function outIndex(){
+  if(_OUTIDX)return _OUTIDX;
+  _OUTIDX={};
+  ((typeof LEDGER!=='undefined'&&LEDGER.out)||[]).forEach(function(o){
+    if(!o||!o.title)return;
+    var m=/^(.*?)\s*\((\d{4})\)\s*$/.exec(o.title);
+    var name=(m?m[1]:o.title).trim().toLowerCase(), year=m?m[2]:"";
+    var spec=((o.copy||"")+"").trim().toLowerCase();
+    /* a row with no year still works - it lands in the wildcard bucket and
+       applies to every year of that title, which is the old behaviour */
+    var k=name+"|"+(year||"*");
+    (_OUTIDX[k]=_OUTIDX[k]||[]).push(spec);
+  });
+  return _OUTIDX;
+}
+function copyMatches(spec,c){
+  if(!spec)return false;
+  var hay=[c.fmt,(typeof fname==='function'?fname(c.fmt):""),c.pub,c.box]
+            .filter(Boolean).join(" ").toLowerCase();
+  return hay.indexOf(spec)>=0;
+}
+/* Greedy assignment, NAMED SPECS FIRST so a blank row can't eat the copy a named
+   row was pointing at. A spec that matches nothing still counts as one disc out -
+   a typo in the Ledger should under-promise, never over-promise. */
+function outInfo(d){
+  if(!d)return {n:0,total:0,copies:[],taken:{},all:false};
+  var copies=(d.allcopies&&d.allcopies.length?d.allcopies:[d]);
+  var IX=outIndex(), nm=((d.movie||"")+"").trim().toLowerCase();
+  var specs=(IX[nm+"|"+(d.year||"")]||[]).concat(IX[nm+"|*"]||[]);
+  var info={n:0,total:copies.length,copies:copies,taken:{},all:false};
+  if(!specs.length)return info;
+  specs.slice().sort(function(a,b){return (b?1:0)-(a?1:0);}).forEach(function(sp){
+    var i,hit=-1;
+    for(i=0;i<copies.length;i++){ if(!info.taken[i]&&sp&&copyMatches(sp,copies[i])){hit=i;break;} }
+    if(hit<0&&!sp){ for(i=0;i<copies.length;i++){ if(!info.taken[i]){hit=i;break;} } }
+    if(hit>=0)info.taken[hit]=1;
+    info.n++;
+  });
+  if(info.n>copies.length)info.n=copies.length;
+  info.all = info.n>=copies.length;
+  return info;
+}
+function outTag(d){
+  var o=outInfo(d);
+  if(!o.n)return "";
+  if(o.all)return '<span class="ontag">OUT</span>';
+  return '<span class="ontag part">'+o.n+' OF '+o.total+' OUT</span>';
+}
 (function(){
   var frag=document.createDocumentFragment();
   FILMS.forEach(function(d){
@@ -1787,7 +1850,7 @@ var OUTSET={};(LEDGER.out||[]).forEach(function(o){if(o.title)OUTSET[o.title.rep
         (d.pub?'<span class="nm">'+esc(d.pub)+'</span>':'')+
         (d.fmt?'<span class="nf">'+esc(fname(d.fmt))+'</span>':'')+'</span>'+
       (cv?'<img alt="'+esc(d.movie)+'" loading="lazy" src="'+cv+'" onerror="this.style.display=\'none\'">':'')+
-      (OUTSET[d.movie]?'<span class="ontag">OUT</span>':'')+playTag(d)+
+      outTag(d)+playTag(d)+
       '</div><div class="cface cback">'+
       '<span class="t">'+esc(d.movie)+'</span>'+
       '<span class="m">'+esc([d.year,d.dir,d.pub].filter(Boolean).join(" · "))+'</span>'+
@@ -1931,7 +1994,8 @@ function ledList(el,items,emptyText){
     ? items.map(function(o){return '<p>'+esc(o)+'</p>';}).join("")
     : '<p class="empty">'+emptyText+'</p>';
 }
-ledList('outnow',(LEDGER.out||[]).map(function(o){return o.title+" — "+o.member+(o.since?" (out "+o.since+")":"");}),
+ledList('outnow',(LEDGER.out||[]).map(function(o){
+    return o.title+(o.copy?" \u00b7 "+o.copy:"")+" — "+o.member+(o.since?" (out "+o.since+")":"");}),
   "Nothing out.");
 ledList('history',(LEDGER.history||[]).map(function(o){return o.title+" — "+o.member+(o.out?" ("+o.out+" → "+o.back+")":"");}),
   "No rentals on record.");
