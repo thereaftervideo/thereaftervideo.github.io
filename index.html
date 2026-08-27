@@ -322,8 +322,11 @@ h2 .tick{color:var(--amber)}
   font-family:inherit;font-size:14px;letter-spacing:.06em;cursor:pointer;border-radius:2px}
 .slip .go2:hover{background:rgba(43,38,32,.08)}
 /* on a phone the OS mail app is the reliable route, so it leads; on desktop Gmail-web does */
-#slipmailbtn{display:none}
+#slipmailbtn,#slipgmailapp{display:none}
 .slip.mobile #slipmailbtn{display:block}
+.slip.ios #slipgmailapp{display:block;background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink)}
+.slip.ios #slipgmailapp:hover{background:rgba(43,38,32,.08)}
+.slip.ios #slipgmail{flex-basis:100%}
 .slip.mobile #slipgmail{background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink)}
 .slip.mobile #slipgmail:hover{background:rgba(43,38,32,.08)}
 .slip.mobile #altsep,.slip.mobile #slipmail{display:none}
@@ -529,6 +532,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     </div>
     <div class="acts">
       <a class="go" id="slipmailbtn" href="#">OPEN IN MAIL</a>
+      <a class="go" id="slipgmailapp" href="#">GMAIL APP</a>
       <a class="go" id="slipgmail" href="#" target="_blank" rel="noopener">SEND WITH GMAIL</a>
       <button class="go2" id="slipcopy">COPY THE SLIP</button>
     </div>
@@ -539,7 +543,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <a id="slipmail" href="#">your mail app</a>
       <button class="nah" id="slipnah">never mind</button>
     </div>
-    <p class="iostip" id="iostip">On iPhone, <b>OPEN IN MAIL</b> hands the slip to whichever mail app you've set as default. To make that Gmail: <b>Settings &rsaquo; Apps &rsaquo; Mail &rsaquo; Default Mail App &rsaquo; Gmail</b>. One time, then it sticks.</p>
+    <p class="iostip" id="iostip"><b>On iPhone:</b> GMAIL APP jumps straight into Gmail &mdash; make sure it's installed, or iOS will complain. OPEN IN MAIL uses whatever mail app you've set as default; to make that Gmail permanently, it's <b>Settings &rsaquo; Apps &rsaquo; Mail &rsaquo; Default Mail App &rsaquo; Gmail</b>. One time, then it sticks.</p>
     <div class="copied" id="slipcopied"></div>
     <p class="addr">Any of these just writes the email for you. However it goes, it ends up at<br><b id="storeaddr"></b></p>
     <p class="fine" id="slipfine">All rentals require management approval. You'll hear back.</p>
@@ -1628,6 +1632,9 @@ function updateMailto(){
   var mt="mailto:"+STORE_EMAIL+"?subject="+su+"&body="+bo;
   document.getElementById('slipmail').setAttribute('href',mt);
   document.getElementById('slipmailbtn').setAttribute('href',mt);
+  /* iOS Gmail app scheme — only surfaced on iOS, and the tip warns it needs the app */
+  document.getElementById('slipgmailapp').setAttribute('href',
+    "googlegmail:///co?to="+encodeURIComponent(STORE_EMAIL)+"&subject="+su+"&body="+bo);
   document.getElementById('slipgmail').setAttribute('href',
     "https://mail.google.com/mail/?view=cm&fs=1&tf=1&to="+encodeURIComponent(STORE_EMAIL)+"&su="+su+"&body="+bo);
   document.getElementById('slipoutlook').setAttribute('href',
@@ -1641,7 +1648,7 @@ function rememberMember(){
   try{localStorage.setItem('tv-member',document.getElementById('memname').value.trim());}catch(e){}
   updateMailto();
 }
-['slipmail','slipmailbtn','slipgmail','slipoutlook'].forEach(function(id){
+['slipmail','slipmailbtn','slipgmailapp','slipgmail','slipoutlook'].forEach(function(id){
   document.getElementById(id).addEventListener('click',rememberMember);
 });
 /* Phones: the OS mail app handles mailto: and lands in whatever app the member
@@ -1698,7 +1705,10 @@ document.getElementById('slipwrap').addEventListener('click',function(e){
 
 /* ---------- global clicks ---------- */
 document.addEventListener('click',function(e){
+  /* the title/set overlay has its own REQUEST + ASK handlers that know what's open;
+     this generic one must not fire for them or it re-opens the slip with no title */
   var b=e.target.closest?e.target.closest('.rent'):null;
+  if(b&&b.closest('.titlecard'))return;
   if(b){e.stopPropagation();openSlip('request',b.getAttribute('data-film'),b.getAttribute('data-year'));return;}
   var fx=e.target.closest?e.target.closest('.cbox a.fix'):null;
   if(fx){return;}
