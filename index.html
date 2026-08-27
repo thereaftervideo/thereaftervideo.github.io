@@ -411,7 +411,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     </div>
     <div class="sideinfo">
       <span>MEMBERS ONLY</span>
-      <span class="price">RENTALS $0.00 &middot; 3 NIGHTS</span>
+      <span class="price">RENTALS $0.00 &middot; ASK FOR WHAT YOU NEED</span>
     </div>
   </div>
   <div class="colorwall">
@@ -427,7 +427,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 <div class="boards">
 <div class="notices">
   <div class="note"><b>LATE FEES: $0.00</b></div>
-  <div class="note"><b>ALL RENTALS</b> require approval. Counter handoff. Shipping for members in good standing.</div>
+  <div class="note"><b>ALL RENTALS</b> require approval. Counter handoff. Shipping for members in good standing. <b>Keep it as long as you need</b> &mdash; say how long on the slip.</div>
   <div class="note"><b>STAMPED TITLES:</b> read the card on file before renting.</div>
   <div class="note"><b>BOX SETS</b> rent complete.</div>
   <div class="note"><b>BOX ART IS APPROXIMATE.</b> Some covers show a different edition than the copy on the shelf. If the box you got looks different, report it from the title's card.</div>
@@ -435,7 +435,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 </div>
 
 <h2 id="shelfsec"><span class="tick">&#9654;</span> The Manager's Shelf</h2>
-<p class="kicker">$0.00 &middot; 3 NIGHTS &middot; NEGOTIABLE</p>
+<p class="kicker">$0.00 &middot; TELL US HOW LONG YOU NEED IT</p>
 <div class="shelfwrap"><div class="vhsshelf" id="picks"></div></div>
 
 <h2 id="floorsec"><span class="tick">&#9654;</span> The Floor</h2>
@@ -522,6 +522,14 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <select id="handoff">
         <option value="Counter handoff">Counter handoff</option>
         <option value="Shipping (members in good standing)">Shipping &mdash; members in good standing</option>
+      </select>
+      <label for="howlong">HOW LONG DO YOU NEED IT?</label>
+      <select id="howlong">
+        <option value="A few nights">A few nights</option>
+        <option value="About a week">About a week</option>
+        <option value="A couple of weeks">A couple of weeks</option>
+        <option value="No rush - whenever I get to it">No rush &mdash; whenever I get to it</option>
+        <option value="Not sure - you tell me">Not sure &mdash; you tell me</option>
       </select>
       <label for="slipnote">NOTE TO THE MANAGEMENT (optional)</label>
       <textarea id="slipnote" placeholder="optional"></textarea>
@@ -1037,8 +1045,8 @@ Following,Christopher Nolan,1998,Blu Ray,Criterion,,R,,,THRILLER,A,BD
 Newman's Law,Richard T. Heffron,1974,Blu Ray,Kino Lorber,label inferred,PG,,,CRIME,A,BD
 True Lies,James Cameron,1994,UHD,20th Century Studios,label inferred,R,,,ACTION,FREE,UHD+BD
 Insomnia,Christopher Nolan,2002,Blu Ray,Warner Bros.,label inferred,R,,,THRILLER,A,BD
-Project Greenlight Season 2,N/A,2003,DVD,Miramax,label inferred,TV,,,TV,1,DVD
-The Battle of Shaker Heights,Efram Potelle and Kyle Rankin,2003,DVD,Miramax,label inferred,PG-13,,,DRAMA,1,DVD
+Project Greenlight Season 2,N/A,2003,DVD,Miramax,Project Greenlight Season 2 - label inferred,TV,,,TV,1,DVD
+The Battle of Shaker Heights,Efram Potelle and Kyle Rankin,2003,DVD,Miramax,Project Greenlight Season 2 - label inferred - the film the season produced; packaged with the set (web-verified Aug 27 2026),PG-13,,,DRAMA,1,DVD
 Wadd: The Life and Times of John C Holmes,Cass Paley,1999,Blu Ray,Vinegar Syndrome,,NR,Strong content,adult-industry documentary with explicit clips,DOCUMENTARY,A,BD
 Everything to Entertain You: The Story of Video Headquarters,Brantley C. Palmer,2023,Blu Ray,Vinegar Syndrome,,NR,,,DOCUMENTARY,A,BD
 Redacted,Brian De Palma,2007,Blu Ray,Vinegar Syndrome,,R,,,WAR,A,BD
@@ -1047,8 +1055,8 @@ For Madmen Only: The Stories of Del Close,Heather Ross,2020,Blu Ray,Vinegar Synd
 Basket Case,Frank Henenlotter,1982,UHD,Arrow,year corrected from 1981 Aug 21,NR,,,HORROR,FREE,UHD
 Hell Comes to Frogtown,Donald G. Jackson and R.J. Kizer,1988,Blu Ray,Vinegar Syndrome,,R,,,THEREAFTER,A,BD
 The Terminator,James Cameron,1984,UHD,Warner Bros.,label inferred,R,,,SCI-FI & FANTASY,FREE,UHD
-Project Greenlight Season 1,N/A,2002,DVD,Miramax,label inferred,TV,,,TV,1,DVD
-Stolen Summer,Pete Jones,2002,DVD,Miramax,label inferred,PG,,,DRAMA,1,DVD
+Project Greenlight Season 1,N/A,2002,DVD,Miramax,Project Greenlight Season 1 - label inferred,TV,,,TV,1,DVD
+Stolen Summer,Pete Jones,2002,DVD,Miramax,Project Greenlight Season 1 - label inferred - the film the season produced; packaged with the set (web-verified Aug 27 2026),PG,,,DRAMA,1,DVD
 Terminator 2: Judgment Day,James Cameron,1991,Blu Ray,Lionsgate,Skynet Edition,R,,,SCI-FI & FANTASY,A,BD
 Titanic,James Cameron,1997,UHD,Paramount,25th Anniversary Collector's Edition,PG-13,,,DRAMA,FREE,UHD+BD
 The Master,Paul Thomas Anderson,2012,Blu Ray,Anchor Bay,label inferred,R,,,DRAMA,A,BD
@@ -1278,7 +1286,8 @@ var KNOWN_SETS=["Mel Brooks Collection","Ingmar Bergman's Cinema","Friday The 13
  "French Connection 2 Movie Pack","Man With No Name Collection","Pusher Trilogy",
  "John Cassavetes: Five Films","Dark Knight Trilogy","The Godfather Trilogy",
  "Jackie Chan's Breakout Hits!","Gidget: The Complete Collection","Triple Feature",
- "Lars von Trier: A Curzon Collection"];
+ "Lars von Trier: A Curzon Collection",
+ "Project Greenlight Season 1","Project Greenlight Season 2"];
 function setName(n){
   var t=n.trim();
   if(t==="Grindhouse")return "Grindhouse";
@@ -1608,6 +1617,7 @@ function slipText(){
   var name=document.getElementById('memname').value.trim()||"(unsigned)";
   if(slipMode==='request'){
     var handoff=document.getElementById('handoff').value;
+    var howlong=document.getElementById('howlong').value;
     var note=document.getElementById('slipnote').value.trim();
     return {
       subject:"RENTAL REQUEST — "+(slipFilm?slipFilm.t+" ("+slipFilm.y+")":""),
@@ -1616,6 +1626,7 @@ function slipText(){
         "TITLE:   "+(slipFilm?slipFilm.t+" ("+slipFilm.y+")":"")+"\n"+
         "MEMBER:  "+name+"\n"+
         "PICKUP:  "+handoff+"\n"+
+        "HOW LONG: "+howlong+"\n"+
         (note?"NOTE:    "+note+"\n":"")+
         "--------------------------------------\n"};
   }
