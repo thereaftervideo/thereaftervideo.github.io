@@ -20,7 +20,8 @@ a{color:var(--amber)}
 /* ---------- nav ---------- */
 nav{position:sticky;top:0;z-index:12;background:rgba(23,19,15,.97);border-bottom:2px solid var(--amber);
   display:flex;align-items:center;gap:20px;padding:10px 22px;flex-wrap:wrap}
-nav .mini{font-family:"Archivo Black",Archivo,sans-serif;font-size:15px;color:var(--amber);letter-spacing:.02em}
+nav .mini{font-family:"Archivo Black",Archivo,sans-serif;font-size:15px;color:var(--amber);letter-spacing:.02em;cursor:pointer}
+nav .mini:hover span{color:var(--ink)}
 nav .mini span{color:var(--dim)}
 nav a{color:var(--dim);text-decoration:none;font-size:12.5px;font-weight:700;letter-spacing:.12em;cursor:pointer}
 nav a:hover{color:var(--ink)}
@@ -34,7 +35,7 @@ nav .sep2{flex:1}
 header{padding:52px 0 6px;display:flex;flex-direction:column;align-items:center;gap:16px}
 .lockup{display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center}
 .plate{background:var(--amber);color:var(--ground);transform:skewX(-8deg);padding:18px 30px 14px;
-  box-shadow:7px 7px 0 #0b0906;position:relative;overflow:hidden}
+  box-shadow:7px 7px 0 #0b0906;position:relative;overflow:hidden;cursor:pointer}
 .plate::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:
    linear-gradient(105deg,transparent 88%,rgba(23,19,15,.28) 88.4%,transparent 89.6%),
@@ -119,7 +120,7 @@ h2 .tick{color:var(--amber)}
 .aislesign::before,.aislesign::after{content:"";position:absolute;top:-14px;width:2px;height:14px;background:var(--line)}
 .aislesign::before{left:22%}.aislesign::after{right:22%}
 .aislesign small{display:block;font-family:"Special Elite",Courier,monospace;font-size:10px;letter-spacing:.25em;opacity:.75}
-.floorbox{border:1px solid var(--line);border-radius:4px;background:var(--surface);max-height:600px;overflow:auto}
+.floorbox{border:1px solid var(--line);border-radius:4px;background:var(--surface)}
 .floorbox.backmode{border-top:8px solid transparent;
   border-image:repeating-linear-gradient(45deg,var(--amber) 0 12px,#191512 12px 24px) 8}
 .frow{display:flex;gap:12px;align-items:baseline;padding:11px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;cursor:pointer}
@@ -134,6 +135,12 @@ h2 .tick{color:var(--amber)}
   font-family:"Archivo Black",Archivo,sans-serif;font-size:11px;padding:6px 14px;cursor:pointer;letter-spacing:.06em}
 .rent:hover{background:#f0cc6e}
 .count{font-family:"Special Elite",Courier,monospace;color:var(--faint);font-size:13px;margin:8px 2px}
+#backhint{margin:12px 0 0;padding:13px 16px;border:1px solid rgba(201,80,63,.45);border-left:5px solid var(--red);
+  border-radius:3px;background:rgba(201,80,63,.07);display:flex;gap:13px;align-items:center;flex-wrap:wrap}
+#backhint span{flex:1 1 260px;font-family:"Special Elite",Courier,monospace;font-size:13px;line-height:1.5;color:var(--red-ink)}
+#backhint button{background:none;border:1.5px solid var(--red);color:var(--red-ink);border-radius:3px;
+  font-family:"Archivo Black",Archivo,sans-serif;font-size:11px;letter-spacing:.07em;padding:9px 16px;cursor:pointer}
+#backhint button:hover{background:rgba(201,80,63,.18)}
 
 /* ---------- cover boxes ---------- */
 .vbtn{background:var(--surface);border:1px solid var(--line);color:var(--dim);
@@ -205,6 +212,19 @@ h2 .tick{color:var(--amber)}
 .boxcard .t{font-weight:700;font-size:15px}
 .boxcard .m{font-family:"Special Elite",Courier,monospace;color:var(--faint);font-size:11.5px}
 .boxcard .films{color:var(--dim);font-size:12.5px;line-height:1.5}
+.boxcard{cursor:pointer}
+.boxcard:hover{border-color:var(--amber-dim)}
+.boxcard .more{font-family:"Special Elite",Courier,monospace;color:var(--amber);font-size:11px;letter-spacing:.05em}
+
+/* what's in the box */
+.setfilms{margin:18px 0 0;border-top:1px dashed var(--line);padding-top:14px}
+.setlab{font-family:"Special Elite",Courier,monospace;color:var(--faint);font-size:11.5px;
+  letter-spacing:.08em;margin:0 0 10px}
+.setrow{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;padding:8px 10px;border-radius:3px;cursor:pointer}
+.setrow:hover{background:var(--surface2)}
+.setrow .st{font-weight:700;font-size:14px}
+.setrow .sy{color:var(--faint);font-variant-numeric:tabular-nums;font-size:13px}
+.setrow .sd{color:var(--dim);font-size:12.5px}
 
 .ledger{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:700px){.ledger{grid-template-columns:1fr}}
@@ -297,6 +317,12 @@ h2 .tick{color:var(--amber)}
 .slip .go2{flex:1 1 120px;background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink);padding:10px;
   font-family:inherit;font-size:14px;letter-spacing:.06em;cursor:pointer;border-radius:2px}
 .slip .go2:hover{background:rgba(43,38,32,.08)}
+/* on a phone the OS mail app is the reliable route, so it leads; on desktop Gmail-web does */
+#slipmailbtn{display:none}
+.slip.mobile #slipmailbtn{display:block}
+.slip.mobile #slipgmail{background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink)}
+.slip.mobile #slipgmail:hover{background:rgba(43,38,32,.08)}
+.slip.mobile #altsep,.slip.mobile #slipmail{display:none}
 .slip .alt{display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;margin-top:11px;font-size:12px;color:#6d6455}
 .slip .alt a{color:#4a4335;text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
 .slip .alt a:hover{color:var(--paper-ink)}
@@ -426,6 +452,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 <div class="aislesign" id="aislesign"></div>
 <div class="floorbox" id="floor"></div>
 <div class="floorbox" id="floorcovers" style="display:none"><div class="covergrid" id="covergrid"></div></div>
+<div id="backhint" style="display:none"></div>
 <p class="count" id="fcount"></p>
 
 <h2 id="ledgersec"><span class="tick">&#9654;</span> The Ledger</h2>
@@ -455,6 +482,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     <p class="meta" id="tcmeta"></p>
     <div class="row-badges" id="tcbadges"></div>
     <p class="desc" id="tcdesc"></p>
+    <div class="setfilms" id="tcfilms" style="display:none"></div>
     <div class="warnband" id="tcwarn" style="display:none">
       <p class="wh" id="tcwarnhead"></p>
       <p id="tcwarnbody"></p>
@@ -492,13 +520,14 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <textarea id="slipq" placeholder="what do you want to know"></textarea>
     </div>
     <div class="acts">
+      <a class="go" id="slipmailbtn" href="#">OPEN IN MAIL</a>
       <a class="go" id="slipgmail" href="#" target="_blank" rel="noopener">SEND WITH GMAIL</a>
       <button class="go2" id="slipcopy">COPY THE SLIP</button>
     </div>
     <div class="alt">
       <span>not Gmail?</span>
       <a id="slipoutlook" href="#" target="_blank" rel="noopener">Outlook</a>
-      <span>&middot;</span>
+      <span id="altsep">&middot;</span>
       <a id="slipmail" href="#">your mail app</a>
       <button class="nah" id="slipnah">never mind</button>
     </div>
@@ -1240,7 +1269,7 @@ function setName(n){
   for(var i=0;i<KNOWN_SETS.length;i++){if(t.indexOf(KNOWN_SETS[i])===0)return KNOWN_SETS[i];}
   return null;
 }
-function badges(d){
+function badges(d,noSet){
   var h="";
   if(d.rating)h+='<span class="rate">'+esc(d.rating)+'</span>';
   h+='<span class="fmt">'+esc(fname(d.fmt))+'</span>';
@@ -1251,7 +1280,7 @@ function badges(d){
   }
   if(d.adv===KW)h+='<span class="stamp k">READ THE CARD</span>';
   else if(d.adv)h+='<span class="stamp s">&#9888; STRONG CONTENT</span>';
-  var s=setName(d.notes); if(s)h+='<span class="setb">rents as set: '+esc(s)+'</span>';
+  if(!noSet){var s=setName(d.notes); if(s)h+='<span class="setb">rents as set: '+esc(s)+'</span>';}
   return h;
 }
 function rowHTML(d){
@@ -1357,10 +1386,21 @@ function matches(d,ql){
   return (!ff||d.fmt===ff)&&(!fr||d.rating===fr)&&
     (!ql||(d.movie+" "+d.dir+" "+d.pub+" "+d.notes+" "+d.sec).toLowerCase().indexOf(ql)>=0);
 }
+function updateBackHint(ql){
+  var el=document.getElementById('backhint');
+  if(fa==="__BACK__"||!ql){el.style.display="none";return;}
+  var n=BACK.filter(function(d){return matches(d,ql);}).length;
+  if(!n){el.style.display="none";return;}
+  el.style.display="flex";
+  el.innerHTML='<span>'+n+(n===1?" more match is":" more matches are")+
+    ' behind the curtain in the back room. Adults only &mdash; every title back there carries a card on file.</span>'+
+    '<button type="button">SHOW '+(n===1?"IT":"THEM")+'</button>';
+}
 function renderFloor(){
   var ql=q.toLowerCase();
   var box=document.getElementById('floor');
   updateSign();
+  updateBackHint(ql);
   box.classList.toggle('backmode',fa==="__BACK__");
   document.getElementById('floorcovers').classList.toggle('backmode',fa==="__BACK__");
   if(fa==="__BOX__"){
@@ -1371,9 +1411,10 @@ function renderFloor(){
     box.innerHTML='<div class="boxgrid">'+names.map(function(s){
       var films=sets[s];var list=films.map(function(d){return d.movie;});
       var shown=list.slice(0,4).join(" · ")+(list.length>4?" · +"+(list.length-4)+" more":"");
-      return '<div class="boxcard"><span class="t">'+esc(s)+'</span>'+
+      return '<div class="boxcard" data-set="'+esc(s)+'"><span class="t">'+esc(s)+'</span>'+
         '<span class="m">'+films.length+' FILMS · RENTS COMPLETE</span>'+
         '<span class="films">'+esc(shown)+'</span>'+
+        '<span class="more">see what\'s in the box &rarr;</span>'+
         '<button class="rent" data-film="'+esc(s)+' [complete box set]" data-year="'+films.length+' films">REQUEST SET</button></div>';
     }).join("")+'</div>';
     document.getElementById('fcount').textContent=names.length+" box sets";
@@ -1447,11 +1488,15 @@ try{var saved=localStorage.getItem('tv-member');if(saved)document.getElementById
 })();
 
 /* ---------- title page ---------- */
-var currentTitle=null;
+var currentTitle=null,currentSet=null;
 function openTitle(name,year){
   var d=FILMS.filter(function(x){return x.movie===name&&(!year||x.year===String(year));})[0]||findFilm(name);
   if(!d)return;
-  currentTitle=d;
+  currentTitle=d; currentSet=null;
+  document.getElementById('tcfilms').style.display="none";
+  document.getElementById('tcfix').style.display="";
+  document.getElementById('tcrent').textContent="REQUEST THIS TITLE";
+  document.getElementById('tcask').textContent="ASK ABOUT THIS TITLE";
   var ci=document.getElementById('tccover'),cv=coverSrc(d);
   if(cv){ci.src=cv;ci.style.display="";}else{ci.removeAttribute('src');ci.style.display="none";}
   document.getElementById('tcname').textContent=d.movie;
@@ -1474,14 +1519,49 @@ function openTitle(name,year){
   document.getElementById('tcfix').setAttribute('href',fixMail(d));
   document.getElementById('titlewrap').classList.add('show');
 }
+function openSet(name){
+  var films=sets[name]; if(!films||!films.length)return;
+  currentSet=name; currentTitle=null;
+  document.getElementById('tccover').style.display="none";
+  document.getElementById('tcname').textContent=name;
+  document.getElementById('tcmeta').textContent=films.length+" films · rents complete";
+  document.getElementById('tcbadges').innerHTML="";
+  var de=document.getElementById('tcdesc');
+  de.textContent="The whole box goes out together — the discs stay in their case.";
+  de.className="desc";
+  document.getElementById('tcwarn').style.display="none";
+  document.getElementById('tcjeff').style.display="none";
+  document.getElementById('tcfix').style.display="none";
+  var seen={},rows=films.filter(function(d){
+      var k=d.movie+"|"+d.year; if(seen[k])return false; seen[k]=1; return true;})
+    .sort(function(a,b){return String(a.year).localeCompare(String(b.year));})
+    .map(function(d){
+      return '<div class="setrow" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">'+
+        '<span class="st">'+esc(d.movie)+'</span><span class="sy">'+esc(d.year)+'</span>'+
+        '<span class="sd">'+esc(d.dir)+'</span>'+
+        '<span class="row-badges">'+badges(d,true)+'</span></div>';
+    }).join("");
+  var fl=document.getElementById('tcfilms');
+  fl.innerHTML='<p class="setlab">WHAT’S IN THE BOX &middot; tap any title for its own card</p>'+rows;
+  fl.style.display="block";
+  document.getElementById('tcrent').textContent="REQUEST THE WHOLE SET";
+  document.getElementById('tcask').textContent="ASK ABOUT THIS SET";
+  document.getElementById('titlewrap').classList.add('show');
+  document.querySelector('.titlecard').scrollTop=0;
+}
 function closeTitle(){document.getElementById('titlewrap').classList.remove('show');}
 document.getElementById('titlex').addEventListener('click',closeTitle);
 document.getElementById('titlewrap').addEventListener('click',function(e){if(e.target===this)closeTitle();});
+function setSlipArgs(){
+  if(currentSet)return[currentSet+" [complete box set]",(sets[currentSet]||[]).length+" films"];
+  if(currentTitle)return[currentTitle.movie,currentTitle.year];
+  return null;
+}
 document.getElementById('tcrent').addEventListener('click',function(){
-  if(currentTitle){closeTitle();openSlip('request',currentTitle.movie,currentTitle.year);}
+  var a=setSlipArgs(); if(a){closeTitle();openSlip('request',a[0],a[1]);}
 });
 document.getElementById('tcask').addEventListener('click',function(){
-  if(currentTitle){closeTitle();openSlip('question',currentTitle.movie,currentTitle.year);}
+  var a=setSlipArgs(); if(a){closeTitle();openSlip('question',a[0],a[1]);}
 });
 
 /* ---------- slip (request + question) ---------- */
@@ -1526,8 +1606,9 @@ function slipText(){
 function updateMailto(){
   var s=slipText();
   var su=encodeURIComponent(s.subject), bo=encodeURIComponent(s.body);
-  document.getElementById('slipmail').setAttribute('href',
-    "mailto:"+STORE_EMAIL+"?subject="+su+"&body="+bo);
+  var mt="mailto:"+STORE_EMAIL+"?subject="+su+"&body="+bo;
+  document.getElementById('slipmail').setAttribute('href',mt);
+  document.getElementById('slipmailbtn').setAttribute('href',mt);
   document.getElementById('slipgmail').setAttribute('href',
     "https://mail.google.com/mail/?view=cm&fs=1&tf=1&to="+encodeURIComponent(STORE_EMAIL)+"&su="+su+"&body="+bo);
   document.getElementById('slipoutlook').setAttribute('href',
@@ -1541,9 +1622,16 @@ function rememberMember(){
   try{localStorage.setItem('tv-member',document.getElementById('memname').value.trim());}catch(e){}
   updateMailto();
 }
-['slipmail','slipgmail','slipoutlook'].forEach(function(id){
+['slipmail','slipmailbtn','slipgmail','slipoutlook'].forEach(function(id){
   document.getElementById(id).addEventListener('click',rememberMember);
 });
+/* Phones: the OS mail app handles mailto: and lands in whatever app the member
+   actually uses (Gmail included, if it's their default), so it leads there. */
+(function(){
+  var coarse=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;
+  if(coarse||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
+    document.querySelector('.slip').classList.add('mobile');
+})();
 function showCopied(html){
   var p=document.getElementById('slipcopied');
   p.innerHTML=html; p.classList.add('show');
@@ -1596,6 +1684,18 @@ document.addEventListener('click',function(e){
   if(fb){var cb0=fb.closest('.cbox');openTitle(cb0.getAttribute('data-film'),cb0.getAttribute('data-year'));return;}
   var cb=e.target.closest?e.target.closest('.cbox'):null;
   if(cb){cb.classList.toggle('flip');return;}
+  var sr=e.target.closest?e.target.closest('.setrow[data-film]'):null;
+  if(sr){openTitle(sr.getAttribute('data-film'),sr.getAttribute('data-year'));return;}
+  var bc=e.target.closest?e.target.closest('.boxcard[data-set]'):null;
+  if(bc){openSet(bc.getAttribute('data-set'));return;}
+  var bk=e.target.closest?e.target.closest('#backhint button'):null;
+  if(bk){
+    backOpen=true; fa="__BACK__";
+    document.getElementById('aisleSel').value="__BACK__";
+    renderFloor();
+    document.getElementById('floorsec').scrollIntoView();
+    return;
+  }
   var row=e.target.closest?e.target.closest('.frow[data-film],.vhs[data-film]'):null;
   if(row){openTitle(row.getAttribute('data-film'),row.getAttribute('data-year'));}
 });
@@ -1606,6 +1706,20 @@ document.addEventListener('keydown',function(e){
 });
 
 /* nav */
+function goHome(){
+  q="";fa="";fr="";ff="";backOpen=false;fv="box";
+  document.getElementById('q').value="";
+  document.getElementById('aisleSel').value="";
+  document.getElementById('rateSel').value="";
+  Array.prototype.forEach.call(document.querySelectorAll('.fbtn'),function(x){
+    x.classList.toggle('on',x.getAttribute('data-f')==="");});
+  Array.prototype.forEach.call(document.querySelectorAll('.vbtn'),function(x){
+    x.classList.toggle('on',x.getAttribute('data-v')==="box");});
+  renderFloor();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelector('nav .mini').addEventListener('click',goHome);
+document.querySelector('.plate').addEventListener('click',goHome);
 function goFloor(){document.getElementById('floorsec').scrollIntoView();document.getElementById('q').focus();}
 document.getElementById('navsearch').addEventListener('click',goFloor);
 document.getElementById('heroterm').addEventListener('click',goFloor);
