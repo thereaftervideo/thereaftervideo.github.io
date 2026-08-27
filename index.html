@@ -161,10 +161,20 @@ h2 .tick{color:var(--amber)}
 .cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   border-radius:3px;overflow:hidden;border:1px solid #000;box-shadow:0 5px 10px rgba(0,0,0,.5)}
 .cfront{background:#0b0906}
-.cfront img{width:100%;height:100%;object-fit:cover;display:block}
-.cfront .nocov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
-  padding:10px;font-family:"Special Elite",Courier,monospace;font-size:12px;color:var(--dim);
+/* The art is a LID over a text plate that is always rendered underneath, so a
+   cover that 404s, is slow, or is blocked leaves a readable card instead of a
+   black rectangle. The <img> carries an inline onerror because it has to be
+   bound at parse time - a listener added later misses an image that already
+   failed. */
+.cfront img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:2}
+.cfront .nocov{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:5px;
+  padding:12px 10px;font-family:"Special Elite",Courier,monospace;color:var(--dim);
   background:repeating-linear-gradient(45deg,#171310 0 14px,#12100c 14px 28px)}
+.cfront .nocov .nt{font-size:12.5px;line-height:1.35;color:var(--ink);font-weight:700}
+.cfront .nocov .nm{font-size:10.5px;line-height:1.4}
+.cfront .nocov .nf{font-size:9.5px;letter-spacing:.08em;color:var(--faint);
+  border:1px solid var(--line);border-radius:2px;padding:1px 6px;margin-top:2px}
 .cfront .ontag{position:absolute;top:6px;right:6px;transform:rotate(4deg);background:var(--red);color:#fff;
   font-family:"Special Elite",Courier,monospace;font-size:9.5px;padding:1px 7px;letter-spacing:.05em;border-radius:2px}
 .cback{transform:rotateY(180deg);background:var(--paper);color:var(--paper-ink);display:flex;flex-direction:column;
@@ -638,7 +648,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 <div class="slipwrap" id="titlewrap" role="dialog" aria-modal="true" aria-label="Title card">
   <div class="titlecard">
     <button class="x" id="titlex" aria-label="Close">&times;</button>
-    <img class="tccov" id="tccover" alt="" style="display:none">
+    <img class="tccov" id="tccover" alt="" style="display:none" onerror="this.style.display='none'">
     <h3 id="tcname"></h3>
     <p class="meta" id="tcmeta"></p>
     <div class="row-badges" id="tcbadges"></div>
@@ -1772,7 +1782,11 @@ var OUTSET={};(LEDGER.out||[]).forEach(function(o){if(o.title)OUTSET[o.title.rep
     var cv=coverSrc(d),desc=descFor(d);
     var fixmail=fixMail(d);
     el.innerHTML='<div class="inner"><div class="cface cfront">'+
-      (cv?'<img alt="'+esc(d.movie)+'" loading="lazy" src="'+cv+'">':'<span class="nocov">'+esc(d.movie)+'</span>')+
+      '<span class="nocov"><span class="nt">'+esc(d.movie)+'</span>'+
+        '<span class="nm">'+esc([d.year,d.dir].filter(Boolean).join(" \u00b7 "))+'</span>'+
+        (d.pub?'<span class="nm">'+esc(d.pub)+'</span>':'')+
+        (d.fmt?'<span class="nf">'+esc(fname(d.fmt))+'</span>':'')+'</span>'+
+      (cv?'<img alt="'+esc(d.movie)+'" loading="lazy" src="'+cv+'" onerror="this.style.display=\'none\'">':'')+
       (OUTSET[d.movie]?'<span class="ontag">OUT</span>':'')+playTag(d)+
       '</div><div class="cface cback">'+
       '<span class="t">'+esc(d.movie)+'</span>'+
@@ -1855,7 +1869,8 @@ function renderFloor(){
       var shown=list.slice(0,4).join(" · ")+(list.length>4?" · +"+(list.length-4)+" more":"");
       var bart=boxSrc(s);
       return '<div class="boxcard'+(bart?' hasart':'')+'" data-set="'+esc(s)+'">'+
-        (bart?'<img class="bxart" src="'+esc(bart)+'" alt="" loading="lazy">':'')+
+        (bart?'<img class="bxart" src="'+esc(bart)+'" alt="" loading="lazy" '+
+              'onerror="this.style.display=\'none\';this.closest(\'.boxcard\').classList.remove(\'hasart\')">':'')+
         '<span class="t">'+esc(s)+'</span>'+
         '<span class="m">'+films.length+' FILMS · RENTS COMPLETE</span>'+
         '<span class="films">'+esc(shown)+'</span>'+
