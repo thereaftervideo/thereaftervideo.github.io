@@ -2002,7 +2002,15 @@ ledList('history',(LEDGER.history||[]).map(function(o){return o.title+" — "+o.
 document.getElementById('floorcount')&&(document.getElementById('floorcount').textContent=FLOOR.length);
 
 document.getElementById('members').innerHTML=(LEDGER.members||[]).map(function(m){return '<option value="'+esc(m.name)+'">';}).join("");
-try{var saved=localStorage.getItem('tv-member');if(saved)document.getElementById('memname').value=saved;}catch(e){}
+/* Prefill the slip's MEMBER NAME. TVenter() also does this, but TVenter only runs
+   when someone walks through the door interactively - a RETURNING member (door
+   token + profile already in localStorage) has the door opened for them by the
+   cold-load path, which never calls it. The result: their slip went out reading
+   "MEMBER: (unsigned)" unless they happened to type their name in by hand.
+   An explicitly typed name (tv-member) still wins over the profile. */
+try{var saved=localStorage.getItem('tv-member');
+    if(!saved){var _p=TVprofile(); saved=_p&&_p.name;}
+    if(saved)document.getElementById('memname').value=saved;}catch(e){}
 
 (function(){
   var n=String(FILMS.length);while(n.length<6)n="0"+n;
@@ -2201,6 +2209,28 @@ function openSlip(mode,t,y){
   document.getElementById('slipwrap').classList.add('show');
   document.getElementById('memname').focus();
 }
+/* The slip used to carry MEMBER / PICKUP / HOW LONG and nothing about the
+   member's setup, so a request arrived and Jeff still had to ask what they play
+   discs on. The answers are already sitting in the profile - send them.
+   A FUNCTION DECLARATION, not a var: everything reachable from earlier code in
+   this file has to be, and slipText() is called from a dozen places. */
+function profileBlock(){
+  var P=TVprofile(); if(!P) return "";
+  var LOC={US:"United States",JP:"Japan",EU:"UK or Europe",OTHER:"Somewhere else"};
+  var TIER={uhd:"plays 4K",bd:"plays Blu-ray",dvd:"plays DVD only",none:"no disc drive"};
+  var SHIP={meet:"can meet up for a hand-off",
+            ship:"needs shipping \u2014 will pay both ways",
+            noship:"shipping doesn't work for them"};
+  var plays=(P.devices&&P.devices.length)?P.devices.join(", ")
+            :(TIER[P.player]||P.player||"not given");
+  var free=(P.free===true)?"Yes":(P.free===false?"No":"not asked");
+  var src=(P.src==="ledger")?"from the Ledger":"self-reported";
+  return "\nTHEIR SETUP ("+src+"):\n"+
+         "  WHERE:       "+(LOC[P.loc]||P.loc||"not given")+"\n"+
+         "  PLAYS ON:    "+plays+"\n"+
+         "  REGION-FREE: "+free+"\n"+
+         "  HAND-OFF:    "+(SHIP[P.ship]||P.ship||"not given")+"\n";
+}
 function slipText(){
   var name=document.getElementById('memname').value.trim()||"(unsigned)";
   if(slipMode==='request'){
@@ -2222,6 +2252,7 @@ function slipText(){
         "PICKUP:  "+handoff+"\n"+
         "HOW LONG: "+howlong+"\n"+
         (note?"NOTE:    "+note+"\n":"")+
+        profileBlock()+
         (flags?"\nHEADS UP — the floor flagged these against my setup:\n"+flags+"\n":"")+
         "--------------------------------------\n"};
   }
@@ -2232,6 +2263,7 @@ function slipText(){
       "--------------------------------------\n"+
       (slipFilm?"TITLE:   "+slipFilm.t+" ("+slipFilm.y+")\n":"")+
       "MEMBER:  "+name+"\n"+
+      profileBlock()+
       "QUESTION:\n"+(qq||"")+"\n"+
       "--------------------------------------\n"};
 }
