@@ -155,18 +155,25 @@ h2 .tick{color:var(--amber)}
 .vbtn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .covergrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:16px;padding:16px}
 .cbox{perspective:1000px;position:relative}
+/* iOS SAFARI. Every -webkit- line and every translateZ below is load-bearing on
+   iPhone and does nothing on desktop. Safari was collapsing the card's two faces
+   into ONE flat picture, so turning it just mirrored the cover art instead of
+   revealing the back - reported by Jeff Aug 28, on the floor and in the back room.
+   A flattened card is the symptom to look for: MIRRORED front, not a blank back. */
 .cbox .inner{position:relative;width:100%;aspect-ratio:31/44;transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
   transition:transform .55s cubic-bezier(.2,.7,.3,1);cursor:pointer}
-.cbox.flip .inner{transform:rotateY(180deg)}
+.cbox.flip .inner{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
 .cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   border-radius:3px;overflow:hidden;border:1px solid #000;box-shadow:0 5px 10px rgba(0,0,0,.5)}
-.cfront{background:#0b0906}
+.cfront{background:#0b0906;transform:translateZ(1px);-webkit-transform:translateZ(1px)}
 /* The art is a LID over a text plate that is always rendered underneath, so a
    cover that 404s, is slow, or is blocked leaves a readable card instead of a
    black rectangle. The <img> carries an inline onerror because it has to be
    bound at parse time - a listener added later misses an image that already
    failed. */
-.cfront img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:2}
+.cfront img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:2;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .cfront .nocov{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;gap:5px;
   padding:12px 10px;font-family:"Special Elite",Courier,monospace;color:var(--dim);
@@ -179,7 +186,8 @@ h2 .tick{color:var(--amber)}
   font-family:"Special Elite",Courier,monospace;font-size:9.5px;padding:1px 7px;letter-spacing:.05em;border-radius:2px}
 /* one of several copies lent: the film is still gettable, so amber, not red */
 .cfront .ontag.part{background:var(--amber);color:var(--ground);font-weight:700}
-.cback{transform:rotateY(180deg);background:var(--paper);color:var(--paper-ink);display:flex;flex-direction:column;
+.cback{transform:rotateY(180deg) translateZ(1px);
+  -webkit-transform:rotateY(180deg) translateZ(1px);background:var(--paper);color:var(--paper-ink);display:flex;flex-direction:column;
   gap:5px;padding:10px 11px 8px;font-family:"Special Elite",Courier,monospace;
   overflow-y:auto;-webkit-overflow-scrolling:touch}
 .cback .acts2{position:sticky;bottom:-8px;margin-top:auto;padding-top:6px;background:var(--paper);z-index:2}
