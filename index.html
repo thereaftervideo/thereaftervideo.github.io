@@ -1994,10 +1994,16 @@ function ledList(el,items,emptyText){
     ? items.map(function(o){return '<p>'+esc(o)+'</p>';}).join("")
     : '<p class="empty">'+emptyText+'</p>';
 }
+/* NO MEMBER NAMES. The loan rows the build ships carry title, copy, out-date
+   and due-date and nothing else - who borrowed what never reaches this page,
+   because the page is world-readable. The build ABORTS if a name gets back in,
+   so if you add a field here, add it to _ALLOWED_OUT in build_thereafter.py
+   too. RETURNED is titles only, newest first, and the build caps the list. */
 ledList('outnow',(LEDGER.out||[]).map(function(o){
-    return o.title+(o.copy?" \u00b7 "+o.copy:"")+" — "+o.member+(o.since?" (out "+o.since+")":"");}),
+    return o.title+(o.copy?" \u00b7 "+o.copy:"")
+         +(o.due?" — back "+o.due:(o.since?" — out since "+o.since:""));}),
   "Nothing out.");
-ledList('history',(LEDGER.history||[]).map(function(o){return o.title+" — "+o.member+(o.out?" ("+o.out+" → "+o.back+")":"");}),
+ledList('history',(LEDGER.history||[]).map(function(o){return o.title;}),
   "No rentals on record.");
 document.getElementById('floorcount')&&(document.getElementById('floorcount').textContent=FLOOR.length);
 
