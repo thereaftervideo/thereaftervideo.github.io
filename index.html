@@ -204,12 +204,8 @@ h2 .tick{color:var(--amber)}
 .cback .full{background:none;border:1.5px solid #6d6455;color:#4a4335;border-radius:2px;
   font-family:"Archivo Black",Archivo,sans-serif;font-size:9.5px;padding:5px 7px;cursor:pointer;letter-spacing:.04em}
 .cback .full:hover{border-color:#2b2620;color:#2b2620}
-.cback .fix{font-size:8.5px;color:#8a8070;text-align:right;text-decoration:underline;text-decoration-style:dotted}
 .vhs .lbl img.cov{width:100%;display:block;border:1px solid #9b917d;border-radius:1px}
-.titlecard img.tccov{float:right;width:138px;max-width:38%;margin:0 0 10px 14px;border:1px solid var(--line);border-radius:3px}
-.titlecard .tcfix{display:inline-block;margin-top:14px;font-family:"Special Elite",Courier,monospace;font-size:11.5px;
-  color:var(--faint);text-decoration:underline;text-decoration-style:dotted}
-.titlecard .tcfix:hover{color:var(--dim)}
+.titlecard img.tccov{float:right;width:138px;max-width:38%;margin:26px 0 10px 14px;border:1px solid var(--line);border-radius:3px}
 
 .row-badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .rate{display:inline-block;border:1.5px solid var(--dim);color:var(--ink);font-size:10.5px;font-weight:700;
@@ -222,8 +218,20 @@ h2 .tick{color:var(--amber)}
   padding:1px 6px;border-radius:2px;white-space:nowrap;border:1px solid transparent}
 .stamp.k{background:var(--red);color:#fff;border-color:var(--red)}
 .stamp.s{background:rgba(224,182,74,.10);color:var(--amber);border-color:rgba(224,182,74,.4)}
-.setb{display:inline-block;font-size:10.5px;color:var(--faint);border:1px dotted var(--faint);
-  padding:1px 6px;border-radius:2px;white-space:nowrap}
+/* --faint on a dark surface is furniture-grey, and this is information: which
+   physical object comes off the shelf. Lifted to --dim, and to the store's
+   mustard when it is a link. The paper card back keeps its own palette. */
+/* ⚠ white-space:nowrap HERE COLLIDES WITH THE FLOATED COVER. A float only
+   shortens the line box; an inline-block wider than what is left overflows to
+   the right and paints straight over the art. Invisible while the cover sat
+   high on the card, obvious the moment it was pushed down - and a long set
+   name on a 390px screen is exactly the case. Set names wrap now; the badge
+   never leaves its column. */
+.setb{display:inline-block;font-size:11px;color:var(--dim);border:1px dotted var(--dim);
+  padding:1px 6px;border-radius:2px;white-space:normal;max-width:100%}
+a.setb.lnk{color:var(--amber);border-color:var(--amber-dim);text-decoration:none;cursor:pointer}
+a.setb.lnk:hover{border-color:var(--amber);background:rgba(224,182,74,.12)}
+.cback .setb{color:#6d6455;border-color:#9b917d}
 
 .gate{padding:44px 26px;text-align:center;font-family:"Special Elite",Courier,monospace;color:var(--red-ink);
   background:repeating-linear-gradient(90deg,#241417 0 10px,#1b0f11 10px 20px)}
@@ -317,9 +325,17 @@ h2 .tick{color:var(--amber)}
 /* title page */
 .titlecard{background:var(--surface);color:var(--ink);max-width:620px;width:100%;border:1px solid var(--line);
   border-top:5px solid var(--amber);border-radius:5px;padding:26px 30px;max-height:88vh;overflow:auto;position:relative}
-.titlecard .x{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--faint);font-size:22px;cursor:pointer;font-family:inherit}
-.titlecard .x:hover{color:var(--ink)}
-.titlecard h3{font-family:"Archivo Black",Archivo,sans-serif;font-weight:400;font-size:26px;margin:0 0 4px;letter-spacing:.02em;padding-right:30px}
+/* THE X SAT ON THE COVER ART AND WAS THE SAME GREY AS THE FURNITURE.
+   img.tccov floats right into exactly this corner, so a faint 25x28 glyph was
+   painted over a picture - unreadable, and it read as belonging to the art
+   rather than to the card. Now: the store's mustard, a thumb-sized hit area,
+   its own plate so it survives whatever is behind it, and the cover pushed
+   down far enough that they never share a row. Same lesson as the slip X. */
+.titlecard .x{position:absolute;top:8px;right:10px;background:rgba(23,19,15,.78);border:none;
+  color:var(--amber);font-size:24px;line-height:1;cursor:pointer;font-family:inherit;
+  padding:5px 11px;border-radius:3px;z-index:3}
+.titlecard .x:hover{color:var(--ink);background:rgba(23,19,15,.92)}
+.titlecard h3{font-family:"Archivo Black",Archivo,sans-serif;font-weight:400;font-size:26px;margin:0 0 4px;letter-spacing:.02em;padding-right:46px}
 .titlecard .meta{color:var(--dim);font-size:14px;margin:0 0 12px}
 .titlecard .desc{font-size:15px;line-height:1.65;margin:14px 0 0;color:var(--ink)}
 .titlecard .desc.pending{color:var(--faint);font-family:"Special Elite",Courier,monospace;font-size:13.5px}
@@ -377,6 +393,21 @@ h2 .tick{color:var(--amber)}
   font-size:11.5px;line-height:1.55;color:#4a4335;background:rgba(155,145,125,.13)}
 .slip.ios .iostip{display:block}
 .slip .alt{display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;margin-top:11px;font-size:12px;color:#6d6455}
+/* MY PLAYERS - the setup sheet. Deliberately built on .slip: same paper, same
+   X, same scroll behaviour, so it is a thing this store already does rather
+   than a new kind of surface. The door is two taps because it is in everyone's
+   way; this is as long as it needs to be, because nobody arrives here without
+   clicking something that says so. */
+.mprow{border:1px dashed #9b917d;padding:10px 11px 12px;margin:8px 0;position:relative}
+.mprow .mprm{position:absolute;top:6px;right:7px;background:none;border:none;color:#6d6455;
+  font-size:11px;letter-spacing:.06em;cursor:pointer;font-family:inherit;padding:4px 6px}
+.mprow .mprm:hover{color:var(--paper-ink)}
+.mprow label{margin-top:8px}
+.mprow label:first-of-type{margin-top:0}
+.mpn{font-size:11px;letter-spacing:.06em;color:#6d6455;margin:0 0 2px}
+#mpadd{margin-top:2px;width:100%}
+#mpafter{margin-top:14px;border-top:1px dashed #9b917d;padding-top:11px;font-size:12.5px}
+#mpafter a{color:var(--paper-ink)}
 .slip .alt a{color:#4a4335;text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
 .slip .alt a:hover{color:var(--paper-ink)}
 .slip .nah{background:none;border:none;color:#6d6455;padding:0;margin-left:auto;
@@ -398,6 +429,12 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
   nav .sep2{order:2}
   .navsearch{order:3;padding:5px 11px;font-size:10.5px;gap:6px}
   nav a{order:4;font-size:10.5px;letter-spacing:.07em}
+  /* ⚠ THE PHONE NAV ORDERS EVERY ITEM EXPLICITLY, so anything without an
+     `order` falls to 0 and sorts AHEAD OF THE WORDMARK once the bar wraps.
+     MY PLAYERS did exactly that, and CART would have done the same the first
+     time anyone put something in it - the bug was already there, unseen,
+     because the cart is hidden while it is empty. Both carry .navcart. */
+  .navcart{order:5}
   .wrap{padding:0 14px}
   header{padding:34px 0 4px}
   .askjeff{right:10px;bottom:10px;font-size:11.5px;padding:9px 13px}
@@ -475,7 +512,6 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
   font-family:"Special Elite",Courier,monospace;font-size:13px;letter-spacing:.07em;font-weight:700;cursor:pointer}
 .cartfoot .clr{background:none;border:0;color:var(--faint);font-size:11.5px;text-decoration:underline;cursor:pointer}
 .cartempty{padding:30px 18px;color:var(--faint);font-size:13px;line-height:1.6;text-align:center}
-.justone{background:none;border:0;color:var(--faint);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:4px 0}
 #slipclear{display:none;margin-top:10px;font-size:11.5px;color:var(--faint)}
 #slipclear.on{display:block}
 #slipclear button{background:none;border:0;color:var(--amber);text-decoration:underline;cursor:pointer;font-size:11.5px}
@@ -575,6 +611,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="4.4"></circle><path d="M9.4 9.4L13 13" stroke-linecap="round"></path></svg>
     SEARCH
   </button>
+  <button class="navcart on" id="navplayers" title="What you play discs on">MY PLAYERS</button>
   <button class="navcart" id="navcart" title="Your cart">CART <span id="cartn">0</span></button>
 </nav>
 <div class="wrap">
@@ -683,8 +720,14 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <button class="rent" id="tcrent">ADD TO CART</button>
       <button class="ghost" id="tcask">ASK ABOUT THIS TITLE</button>
     </div>
-    <button class="justone" id="tcjustone">or ask for just this one, on its own slip &rarr;</button>
-    <a class="tcfix" id="tcfix" href="#">box art wrong? report what your copy actually is &rarr;</a>
+    <!-- REMOVED Aug 29, Jeff: "the store should function like a normal one -
+         add to cart, check out." The one-off slip was a second checkout path
+         beside the cart, and two ways to buy one thing is a worse shop than
+         one. ADD TO CART and ASK ABOUT THIS TITLE remain - a question is not a
+         checkout. Single-title request mode still exists inside openSlip();
+         only this entry point is gone.
+         ALSO REMOVED: "box art wrong?". Folded into check-in validation and
+         queued at the end. fixMail() is left defined for when it comes back. -->
   </div>
 </div>
 
@@ -699,6 +742,31 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <button class="go" id="cartgo">REQUEST THESE &rarr;</button>
       <button class="clr" id="cartclr">empty the cart</button>
     </div>
+  </div>
+</div>
+<div class="slipwrap" id="mpwrap" role="dialog" aria-modal="true" aria-label="My players">
+  <div class="slip">
+    <button class="x" id="mpx" aria-label="Close">&times;</button>
+    <h3>MY PLAYERS</h3>
+    <p class="film" id="mpfilm"></p>
+    <label for="mploc">WHERE ARE YOU?</label>
+    <select id="mploc">
+      <option value="US">United States</option>
+      <option value="JP">Japan</option>
+      <option value="EU">UK or Europe</option>
+      <option value="OTHER">Somewhere else</option>
+    </select>
+    <p class="fine">Discs are region-coded by country, and so are the machines that read them. A player bought where you are reads the discs sold where you are.</p>
+    <label style="margin-top:16px">WHAT YOU PLAY DISCS ON</label>
+    <p class="mpn">One box per machine. If you have two, list two &mdash; a disc plays if <b>one</b> of them can read it.</p>
+    <div id="mpdecks"></div>
+    <button type="button" class="go2" id="mpadd">+ ANOTHER PLAYER</button>
+    <p class="fine" id="mpnone" style="display:none"><b>Nothing listed.</b> If you have no way to play a disc, leave it empty and the floor will stop pretending otherwise.</p>
+    <div class="acts">
+      <button type="button" class="go" id="mpsave">SAVE</button>
+      <button type="button" class="go2" id="mpcancel">never mind</button>
+    </div>
+    <div id="mpafter" style="display:none"></div>
   </div>
 </div>
 <div class="slipwrap" id="slipwrap" role="dialog" aria-modal="true" aria-label="Store slip">
@@ -1320,7 +1388,7 @@ Melancholia,Lars Von Trier,2011,Blu Ray,Curzon,Lars von Trier: A Curzon Collecti
 Nymphomaniac: The Director's Cut,Lars Von Trier,2013,Blu Ray,Curzon,Lars von Trier: A Curzon Collection,,,,"2026 Curzon standard edition, 15 discs, Region B - box-locked - Volumes I and II, uncut director's cut on two discs",Unrated,Know what you're renting,unsimulated sex throughout; five-and-a-half-hour cut,DRAMA,B,BD
 The House That Jack Built,Lars Von Trier,2018,Blu Ray,Curzon,Lars von Trier: A Curzon Collection,,,,"2026 Curzon standard edition, 15 discs, Region B - box-locked - director's cut",Unrated,Know what you're renting,serial murder including children; animal cruelty,HORROR,B,BD
 It Follows,David Robert Mitchell,2014,UHD,Second Sight,,Y,,2026-08-27,"Second Sight Limited Edition 4K UHD + Blu - rigid slipcase, 150-page hardback, 6 art cards - OOP, eBay auction won Aug 21 2026 - UHD region-free, bundled Blu Region B - Second Sight UltraHD + a Blu-ray carrying the REGION B hexagon. FREE/B confirmed",R,,,HORROR,FREE/B,UHD+BD
-Rated X,Emilio Estevez,2000,DVD,In2Film,,,Y,,"Ordered Aug 15, checked in Aug 25 - UK In2film Region 2 BBFC 18 disc - RESOLVED Aug 25: the sleeve's '94 min approx' is simply wrong; the disc itself runs 1:49 PAL, about 113 min NTSC-equivalent, i.e. a full-length version - which of the two cuts it is cannot be settled by runtime since the Unrated/R difference is only 54 seconds, below the measurement error - no replacement needed - Mitchell Brothers biopic, companion to the MBFG discs - label inferred",18 (BBFC),Strong content,drug abuse; sex-industry milieu; fratricide,DRAMA,2,DVD
+Rated X,Emilio Estevez,2000,DVD,In2Film,,,Y,2026-08-25,"Ordered Aug 15, checked in Aug 25 - UK In2film Region 2 BBFC 18 disc - RESOLVED Aug 25: the sleeve's '94 min approx' is simply wrong; the disc itself runs 1:49 PAL, about 113 min NTSC-equivalent, i.e. a full-length version - which of the two cuts it is cannot be settled by runtime since the Unrated/R difference is only 54 seconds, below the measurement error - no replacement needed - Mitchell Brothers biopic, companion to the MBFG discs - label inferred",18 (BBFC),Strong content,drug abuse; sex-industry milieu; fratricide,DRAMA,2,DVD
 A Dark Song,Liam Gavin,2016,Blu Ray,A Contracorriente,,,,,"Spanish import titled 'Ritual del Mas Alla' - Region B - original English DTS-HD MA 5.1 with Spanish subs - Feb 2025 release - extras: four Liam Gavin short films (53 min), deleted scenes, storyboards, cast and crew interviews",NR,Strong content,occult ritual endurance; grief over a murdered child,HORROR,B,BD
 About Schmidt,Alexander Payne,2002,Blu Ray,New Line,,,,2026-08-27,added Aug 27 2026 - found on the shelf during the scan with no CSV row; edition confirmed from Amazon order history ('About Schmidt (BD)'),R,,,DRAMA,A,BD
 Lord of the Flies,Peter Brook,1963,Blu Ray,Criterion,,,,2026-08-27,"added Aug 27 2026 - found on the shelf during the scan with no CSV row; edition confirmed from Amazon order history ('Lord of the Flies (The Criterion Collection) [Blu-ray]') - Criterion released the 1963 Peter Brook version, NOT the 1990 remake",NR,,,DRAMA,A,BD
@@ -1635,22 +1703,38 @@ function myDecks(P){
      of what we do know. Identical behaviour to before for anybody we have
      learned nothing new about. */
   var b=BDREG[P.loc]||"",v=DVDREG[P.loc]||"";
-  /* ONLY a region-free claim from Jeff's own Ledger widens the regions. A
-     member who ticked the box themselves keeps their location's regions, so
-     the disc falls through to freeSoft() and reads AMBER instead of a green
-     we cannot stand behind. That is the whole Chris correction. */
+  /* ONLY a region-free claim from Jeff's own Ledger widens the TRUSTED
+     regions. A member who ticked the box themselves gets those regions as a
+     CLAIM instead, so the disc reads AMBER rather than a green we cannot
+     stand behind. That is the whole Chris correction. */
   var trusted=(P.free===true&&P.src==="ledger");
+  var claimed=(P.free===true&&P.src!=="ledger");
   return [{tier:P.player,
            bd:(trusted?ALLBD:(b?[b]:[])),
            dvd:(trusted?ALLDVD:(v?[v]:[])),
+           bdClaim:(claimed?ALLBD:[]),
+           dvdClaim:(claimed?ALLDVD:[]),
            pal:(P.pal===true),free:(P.free===true)}];
 }
-/* A REGION-FREE CLAIM WE CANNOT VOUCH FOR IS "NOT SURE", NOT "YES".
-   Jeff's Ledger entry is authoritative. A member ticking a box on the door is
-   not - that box is exactly what produced a false yes once already (Chris does
-   not own a region-free player; he owns one from another country). So it warns
-   instead of promising, and the slip can then ask the question that settles it. */
-function freeSoft(P){return P.free===true&&P.src!=="ledger";}
+/* OBJECT FACTS GRANT. CAPABILITY CLAIMS STAY AMBER. (Jeff's call, Aug 29.)
+   Every deck carries TWO region sets. `bd`/`dvd` are what we can stand
+   behind: what the machine IS and where it CAME FROM - both facts about an
+   object - plus anything Jeff has written into the Ledger himself.
+   `bdClaim`/`dvdClaim` are what the member has told us their machine can DO:
+   "it is region-free", "I bought it to play discs from other countries". A
+   disc matched by the first set is GREEN; matched only by the second, AMBER.
+
+   That is the line Chris broke, drawn exactly where he broke it. He was right
+   about his object (a Blu-ray player from the UK) and wrong about its
+   capability (region-free). Under this split he could not have produced the
+   false yes: ticking region-free can only move a disc to amber, never to
+   green. Jeff sees the amber, confirms it, writes it into the Ledger, and the
+   next build turns it green - the Ledger stays the only thing that promises.
+
+   This replaced a profile-level test, which asked the same question of the
+   WHOLE MEMBER. A profile-level answer cannot describe someone with one
+   honest deck and one claimed one - the same shape of mistake as the union
+   bug. Capability is per-deck, all the way down. */
 function inReg(list,reg){return (list||[]).indexOf(reg)>=0;}
 function G(){return {v:"green"};}
 function canPlayOn(d,k,P,ctx){
@@ -1665,7 +1749,7 @@ function canPlayOn(d,k,P,ctx){
     if(d.pal&&k.pal!==true)return maybe("This is a PAL disc. It plays on a computer, a PS5 or Xbox, and most modern DVD decks — but an older standalone DVD player may refuse it.");
     if(!(k.dvd||[]).length)return maybe("We don't know which DVD region your part of the world uses, so we can't promise this one. Ask the management.");
     if(reg==="FREE"||reg==="FREE/A"||inReg(k.dvd,reg))return soft(G());
-    if(freeSoft(P))return maybe("This is a Region "+reg+" DVD, which a player bought in your own country won't read. You told us one of yours plays other regions — we can't confirm that from here, so ask and the management will check.");
+    if(inReg(k.dvdClaim,reg))return maybe("This is a Region "+reg+" DVD, which a player bought in your own country won't read. You've told us this one plays other regions — we can't confirm that from here, so ask and the management will check.");
     return {v:"red",why:"This is a Region "+reg+" DVD. Your player is Region "+k.dvd.join(" and ")+", so it won't read the disc."};
   }
   if(is4k){
@@ -1674,13 +1758,13 @@ function canPlayOn(d,k,P,ctx){
     if(!hasBD)return {v:"red",why:"This case holds a 4K disc and nothing else — there's no standard Blu-ray inside, so you'd need a 4K player."};
     if(!(k.bd||[]).length)return maybe("We don't know your Blu-ray region. The 4K disc would play on a 4K deck; the Blu-ray in the case may not.");
     if(bdreg==="FREE"||inReg(k.bd,bdreg)||(bdreg==="1"&&inReg(k.bd,"A")))return soft(G());
-    if(freeSoft(P))return maybe("The standard Blu-ray in this case is Region "+bdreg+". You told us one of your players handles other regions — worth confirming with the management before you ask.");
+    if(inReg(k.bdClaim,bdreg))return maybe("The standard Blu-ray in this case is Region "+bdreg+". You've told us this player handles other regions — worth confirming with the management before you ask.");
     return {v:"red",why:"The 4K disc in this case plays anywhere, but you'd need a 4K player for it. The standard Blu-ray inside is Region "+bdreg+" and yours is Region "+k.bd.join(" and ")+"."};
   }
   if(k.tier==="dvd")return {v:"red",why:"This is a Blu-ray and your setup plays DVDs only."};
   if(!(k.bd||[]).length)return maybe("We don't know which Blu-ray region your part of the world uses. Ask the management.");
   if(reg==="FREE"||reg==="FREE/A"||inReg(k.bd,reg)||(reg==="1"&&inReg(k.bd,"A")))return soft(G());
-  if(freeSoft(P))return maybe("This is a Region "+reg+" Blu-ray, which a player bought in your own country won't read. You told us one of yours plays other regions — ask and the management will confirm.");
+  if(inReg(k.bdClaim,reg))return maybe("This is a Region "+reg+" Blu-ray, which a player bought in your own country won't read. You've told us this player handles other regions — ask and the management will confirm.");
   return {v:"red",why:"This is a Region "+reg+" Blu-ray. Your player is Region "+k.bd.join(" and ")+", so it won't read the disc."};
 }
 function canPlay(d,P){
@@ -1721,7 +1805,7 @@ function playFor(d){
 function playTag(d){
   var r=playFor(d); if(!r)return "";
   if(r.v==="green")return r.swapped?'<span class="playtag amber">THE '+esc(fname(r.copy.fmt)).toUpperCase()+' COPY</span>':"";
-  return '<span class="playtag '+r.v+'">'+(r.v==="red"?"WON'T PLAY FOR YOU":"CHECK BEFORE YOU ASK")+'</span>';
+  return '<span class="playtag '+r.v+'">'+(r.v==="red"?"WON'T PLAY FOR YOU":"CHECK IF IT PLAYS")+'</span>';
 }
 function playWhy(d){
   var r=playFor(d); if(!r)return "";
@@ -1736,8 +1820,15 @@ function playWhy(d){
     head=(r.v==="red")?"THIS ONE WON'T PLAY ON YOUR SETUP":"WORTH CHECKING FIRST";
     body=r.why+(r.swapped?" You'd be given the "+fname(r.copy.fmt)+" copy instead.":"");
   }
+  /* Jeff's copy, decided: both halves are links. The second one goes to the
+     EXISTING question slip for this title - not a fresh mailto - because that
+     path is already one-title-at-a-time and profileBlock() already attaches
+     their setup, so he gets the question WITH the profile for nothing. */
+  var qy=encodeURIComponent(d.movie)+"|"+encodeURIComponent(String(d.year==null?"":d.year));
   return '<span class="playwhy '+(r.v==="red"?"":"amber")+'"><b>'+head+'</b>'+esc(body)+
-    '<br><a href="'+disputeMail(d,r)+'">that\u2019s not right &mdash; tell the management</a></span>';
+    '<br><a href="#" data-mpopen="'+qy+'">Check that you can play this disc</a> &mdash; or '+
+    '<a href="#" data-mpask="'+qy+'">ask the management</a>.'+
+    '<br><a href="'+disputeMail(d,r)+'">that’s not right &mdash; tell the management</a></span>';
 }
 function disputeMail(d,r){
   return "mailto:"+STORE_EMAIL+"?subject="+encodeURIComponent("PLAYBACK DISPUTE \u2014 "+d.movie+" ("+d.year+")")+
@@ -1755,18 +1846,62 @@ function updateSetupBar(){
   var P=TVprofile();
   document.getElementById('hidewrap').style.display=P?"flex":"none";
   var dismissed=false; try{dismissed=!!localStorage.getItem('tv-setupbar-x');}catch(e){}
-  if(P||dismissed){bar.classList.remove('on');return;}
+  /* The old rule was "show this only to a member with no profile". Under the
+     two-tap door that is nobody - everyone answers on the way in - so the bar
+     was dead code. It is now the one-time nudge toward the panel: shown once,
+     dismissed forever, never in the way. */
+  if(dismissed){bar.classList.remove('on');return;}
   document.getElementById('setupbartext').textContent=
-    "Tell us what you play discs on and the floor will flag anything that won't work on your setup.";
+    "There are discs here from all over the world, in every format. If you want the floor to be exact about yours, click MY PLAYERS at the top.";
   bar.classList.add('on');
 }
 (function(){
   var go=document.getElementById('setupbargo'),x=document.getElementById('setupbarx');
-  if(go)go.onclick=function(){document.getElementById('door').classList.remove('open');TVdoorWho();};
+  if(go){go.textContent="MY PLAYERS";go.onclick=function(){openPlayers();};}
   if(x)x.onclick=function(){try{localStorage.setItem('tv-setupbar-x','1');}catch(e){}updateSetupBar();};
 })();
+/* THE PANEL'S WIRING. Delegated, because the page's JS runs in a closure and
+   nothing here is on window - an inline onclick in card HTML cannot reach it. */
+(function(){
+  var w=document.getElementById('mpwrap');
+  if(!w)return;
+  var xb=document.getElementById('mpx'); if(xb)xb.onclick=closePlayers;
+  var cb=document.getElementById('mpcancel'); if(cb)cb.onclick=closePlayers;
+  var ad=document.getElementById('mpadd');
+  if(ad)ad.onclick=function(){document.getElementById('mpdecks').appendChild(mpRow(null));mpSyncEmpty();};
+  var sv=document.getElementById('mpsave'); if(sv)sv.onclick=mpSave;
+  w.addEventListener('click',function(e){if(e.target===w)closePlayers();});
+  var nav=document.getElementById('navplayers'); if(nav)nav.onclick=function(){openPlayers();};
+  document.addEventListener('keydown',function(e){
+    if(e.key==="Escape"&&w.classList.contains('show'))closePlayers();});
+  document.addEventListener('click',function(e){
+    var a=e.target.closest?e.target.closest('[data-mpopen],[data-mpask],[data-mptell],[data-tvset]'):null;
+    if(!a)return;
+    e.preventDefault();
+    if(a.hasAttribute('data-tvset')){
+      closePlayers();
+      if(typeof closeTitle==='function')closeTitle();
+      openSet(decodeURIComponent(a.getAttribute('data-tvset')));
+      return;
+    }
+    if(a.hasAttribute('data-mpopen')){
+      var v=(a.getAttribute('data-mpopen')||"").split("|");
+      openPlayers(v[0]?decodeURIComponent(v[0]):null, v[1]?decodeURIComponent(v[1]):null);
+    }else if(a.hasAttribute('data-mpask')){
+      var q=(a.getAttribute('data-mpask')||"").split("|");
+      closePlayers();
+      openSlip('question', q[0]?decodeURIComponent(q[0]):null, q[1]?decodeURIComponent(q[1]):null);
+    }else{
+      closePlayers();
+      openSlip('question',null,null);
+      var ta=document.querySelector('#qfields textarea');
+      if(ta){ta.value=mpTellText();
+        if(typeof updateMailto==='function')updateMailto();}
+    }
+  });
+})();
 
-function badges(d,noSet){
+function badges(d,noSet,linkSet){
   var h="";
   if(d.rating)h+='<span class="rate">'+esc(d.rating)+'</span>';
   h+='<span class="fmt">'+esc(fname(d.fmt))+'</span>';
@@ -1777,7 +1912,14 @@ function badges(d,noSet){
   }
   if(d.adv===KW)h+='<span class="stamp k">READ THE CARD</span>';
   else if(d.adv)h+='<span class="stamp s">&#9888; STRONG CONTENT</span>';
-  if(!noSet){var s=d.box; if(s)h+='<span class="setb">rents as set: '+esc(s)+'</span>';}
+  /* ⚠ LINK ONLY WHERE A LINK IS SAFE. Inside a flip card this badge sits on a
+     face that turns when you tap it, and a tap target there fights the flip
+     gesture on the exact iOS surface that broke Aug 28 - the same reason the
+     CHECK IF IT PLAYS badge stays a non-interactive tag. So the flip card gets
+     a readable tag; the title card and the list row get the link. */
+  if(!noSet){var s=d.box; if(s)h+=(linkSet
+    ? '<a href="#" class="setb lnk" data-tvset="'+encodeURIComponent(s)+'">rents as set: '+esc(s)+'</a>'
+    : '<span class="setb">rents as set: '+esc(s)+'</span>');}
   h+=playTag(d);
   return h;
 }
@@ -1785,7 +1927,7 @@ function rowHTML(d){
   return '<div class="frow" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'"><span class="t">'+esc(d.movie)+'</span>'+
     '<span class="yr">'+esc(d.year)+'</span><span class="dir">'+esc(d.dir)+'</span>'+
     (d.pub?'<span class="lab">'+esc(d.pub)+'</span>':"")+
-    '<span class="row-badges">'+badges(d)+'</span><span class="spacer"></span>'+
+    '<span class="row-badges">'+badges(d,false,true)+'</span><span class="spacer"></span>'+
     '<button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">ADD</button></div>';
 }
 function vhsHTML(d,blurb){
@@ -1915,7 +2057,6 @@ function outTag(d){
     el.className='cbox';
     el.setAttribute('data-film',d.movie);el.setAttribute('data-year',d.year);
     var cv=coverSrc(d),desc=descFor(d);
-    var fixmail=fixMail(d);
     el.innerHTML='<div class="inner"><div class="cface cfront">'+
       '<span class="nocov"><span class="nt">'+esc(d.movie)+'</span>'+
         '<span class="nm">'+esc([d.year,d.dir].filter(Boolean).join(" \u00b7 "))+'</span>'+
@@ -1930,7 +2071,6 @@ function outTag(d){
       (desc?'<span class="d">'+esc(desc)+'</span>':'<span class="d pend">Card pending. Ask Jeff about this one.</span>')+playWhy(d)+
       '<div class="acts2"><button class="rent" data-film="'+esc(d.movie)+'" data-year="'+esc(d.year)+'">ADD</button>'+
       '<button class="full">FULL CARD</button></div>'+
-      '<a class="fix" href="'+fixmail+'">wrong art? tell the management</a>'+
       '</div></div>';
     d.__box=el;
     frag.appendChild(el);
@@ -2104,15 +2244,13 @@ function openTitle(name,year){
   if(!d)return;
   currentTitle=d; currentSet=null;
   document.getElementById('tcfilms').style.display="none";
-  document.getElementById('tcfix').style.display="";
   document.getElementById('tcrent').textContent="ADD TO CART";
-  document.getElementById('tcjustone').textContent="or ask for just this one, on its own slip \u2192";
   document.getElementById('tcask').textContent="ASK ABOUT THIS TITLE";
   var ci=document.getElementById('tccover'),cv=coverSrc(d);
   if(cv){ci.src=cv;ci.style.display="";}else{ci.removeAttribute('src');ci.style.display="none";}
   document.getElementById('tcname').textContent=d.movie;
   document.getElementById('tcmeta').textContent=[d.year,d.dir,d.pub,fname(d.fmt),(d.copies>1?d.copies+" copies on the shelf":"")].filter(Boolean).join(" · ");
-  document.getElementById('tcbadges').innerHTML=badges(d);
+  document.getElementById('tcbadges').innerHTML=badges(d,false,true);
   var desc=descFor(d);
   var de=document.getElementById('tcdesc');
   if(desc){de.textContent=desc;de.className="desc";}
@@ -2127,7 +2265,6 @@ function openTitle(name,year){
   var j=JEFF[d.movie];
   document.getElementById('tcjeff').style.display=j?"block":"none";
   if(j)document.getElementById('tcjeffbody').textContent=j;
-  document.getElementById('tcfix').setAttribute('href',fixMail(d));
   document.getElementById('titlewrap').classList.add('show');
 }
 function openSet(name){
@@ -2143,7 +2280,6 @@ function openSet(name){
   de.className="desc";
   document.getElementById('tcwarn').style.display="none";
   document.getElementById('tcjeff').style.display="none";
-  document.getElementById('tcfix').style.display="none";
   var seen={},rows=films.filter(function(d){
       var k=d.movie+"|"+d.year; if(seen[k])return false; seen[k]=1; return true;})
     .sort(function(a,b){return String(a.year).localeCompare(String(b.year));})
@@ -2157,7 +2293,6 @@ function openSet(name){
   fl.innerHTML='<p class="setlab">WHAT’S IN THE BOX &middot; tap any title for its own card</p>'+rows;
   fl.style.display="block";
   document.getElementById('tcrent').textContent="ADD THE WHOLE SET";
-  document.getElementById('tcjustone').textContent="or ask for just this set, on its own slip \u2192";
   document.getElementById('tcask').textContent="ASK ABOUT THIS SET";
   document.getElementById('titlewrap').classList.add('show');
   document.querySelector('.titlecard').scrollTop=0;
@@ -2172,9 +2307,6 @@ function setSlipArgs(){
 }
 document.getElementById('tcrent').addEventListener('click',function(e){
   var a=setSlipArgs(); if(a)addToCart(a[0],a[1],e.currentTarget);
-});
-document.getElementById('tcjustone').addEventListener('click',function(){
-  var a=setSlipArgs(); if(a){closeTitle();openSlip('request',a[0],a[1]);}
 });
 document.getElementById('tcask').addEventListener('click',function(){
   var a=setSlipArgs(); if(a){closeTitle();openSlip('question',a[0],a[1]);}
@@ -2266,6 +2398,245 @@ function closeCart(){ document.getElementById('cartwrap').classList.remove('show
   });
 })();
 
+/* ---------- MY PLAYERS - the setup sheet ----------
+   ONE COMPONENT, THREE DOORS IN: a red/amber card back, the request slip
+   scoped to one disc, and a permanent link in the top bar so it is never a
+   dead end. Jeff's principle, and it is the whole reason the depth belongs
+   here rather than at the door: "not friction since they asked."
+
+   IT ASKS ABOUT OBJECTS, NEVER ABOUT CAPABILITIES. What is the machine, and
+   where did it come from. Both are things a person can answer by looking at a
+   shelf. "Is it region-free" and "is it PAL-capable" are not - Chris did not
+   know what PAL is, and the form made him answer anyway. Where a machine came
+   from settles region AND PAL between them, so we never have to ask.
+
+   FOURTH USE, NOT MEMBER-FACING: this is Jeff's test harness. Change the rows,
+   save, and the floor repaints as that member. It is the only way to look at
+   the shelf through someone else's setup without clearing localStorage. */
+var MPC={US:["A","1",false,"US"],CA:["A","1",false,"Canada"],JP:["A","2",false,"Japan"],
+         UK:["B","2",true,"UK"],EU:["B","2",true,"Europe"],AU:["B","4",true,"Australia"],
+         NZ:["B","4",true,"New Zealand"]};
+var MPHOME={US:"US",JP:"JP",EU:"UK",OTHER:""};
+/* group, name, tier, is-console, always-handles-PAL.
+   THE NAMES MUST MATCH THE BUILD'S DEVICE TABLE EXACTLY - what this panel
+   writes into deckstext is what Jeff pastes into the Ledger's Decks cell, and
+   a name the build does not recognise grants nothing. */
+var MPDEV=[["PLAYS 4K","Xbox Series X","uhd",1,1],
+           ["","Xbox One S or One X","uhd",1,1],
+           ["","PS5 with a disc drive","uhd",1,1],
+           ["","4K Blu-ray player","uhd",0,0],
+           ["PLAYS BLU-RAY, NOT 4K","PS4","bd",1,1],
+           ["","PS3","bd",1,1],
+           ["","Xbox One (original)","bd",1,1],
+           ["","Blu-ray player","bd",0,0],
+           ["PLAYS DVD ONLY","DVD player","dvd",0,0],
+           ["","computer with a disc drive","dvd",0,1]];
+var MPBEFORE=null, MPSCOPE=null;
+function mpDev(n){for(var i=0;i<MPDEV.length;i++){if(MPDEV[i][1]===n)return MPDEV[i];}return null;}
+function mpHome(){return MPHOME[(document.getElementById('mploc')||{}).value||"US"]||"";}
+function mpIsConsole(n){var d=mpDev(n);return !!(d&&d[3]);}
+
+/* a row of the editor. Origin is asked of consoles too - a console's region is
+   set by where it was bought and cannot be changed - but the region-free
+   option is NEVER offered for one, because there is no such console. */
+function mpRow(pre){
+  var wrap=document.createElement('div'); wrap.className='mprow';
+  var opts='<option value="">&mdash; pick one &mdash;</option>',g="";
+  for(var i=0;i<MPDEV.length;i++){
+    if(MPDEV[i][0]&&MPDEV[i][0]!==g){if(g)opts+='</optgroup>';g=MPDEV[i][0];opts+='<optgroup label="'+g+'">';}
+    opts+='<option value="'+esc(MPDEV[i][1])+'">'+esc(MPDEV[i][1])+'</option>';
+  }
+  opts+='</optgroup><option value="__other__">Something else &mdash; let me tell you what it is</option>';
+  var cs=""; for(var k in MPC){if(MPC.hasOwnProperty(k))cs+='<option value="'+k+'">'+esc(MPC[k][3])+'</option>';}
+  wrap.innerHTML=
+    '<button type="button" class="mprm">REMOVE</button>'+
+    '<label>WHAT IS IT?</label><select class="mpkind">'+opts+'</select>'+
+    '<div class="mpother" style="display:none"><label>WHAT IS IT, THEN?</label>'+
+      '<input class="mptext" type="text" placeholder="an old Sony thing my brother gave me&hellip;">'+
+      '<p class="fine">Until the management has worked out what it is, the floor will say <b>we’re not sure</b> rather than guess at you.</p></div>'+
+    '<div class="mpmain" style="display:none">'+
+      '<label>WHERE DID IT COME FROM?</label><select class="mporigin">'+
+        '<option value="here">Bought it here, normally</option>'+
+        '<option value="abroad">It came from another country</option>'+
+        '<option value="multi">I bought it specially to play discs from other countries</option>'+
+        '<option value="dunno">Not sure</option></select>'+
+      '<div class="mpcw" style="display:none"><label>WHICH COUNTRY?</label><select class="mpcountry">'+cs+'</select></div>'+
+      '<label>MAKE AND MODEL, IF YOU KNOW IT (optional)</label>'+
+      '<input class="mpmake" type="text" placeholder="it is on the front of the thing">'+
+      '<p class="fine">Only helps if the management recognises it. Leave it blank and nothing is lost.</p>'+
+    '</div>';
+  function sync(){
+    var kind=wrap.querySelector('.mpkind').value;
+    var other=(kind==="__other__");
+    wrap.querySelector('.mpother').style.display=other?"block":"none";
+    wrap.querySelector('.mpmain').style.display=(kind&&!other)?"block":"none";
+    var os=wrap.querySelector('.mporigin');
+    /* A CONSOLE CANNOT BE MADE REGION-FREE. Never offer it the question. */
+    var mo=os.querySelector('option[value="multi"]');
+    if(mo)mo.disabled=mpIsConsole(kind);
+    if(mo&&mo.disabled&&os.value==="multi")os.value="here";
+    wrap.querySelector('.mpcw').style.display=(os.value==="abroad")?"block":"none";
+  }
+  wrap.addEventListener('change',sync);
+  wrap.querySelector('.mprm').onclick=function(){wrap.parentNode.removeChild(wrap);mpSyncEmpty();};
+  if(pre){
+    wrap.querySelector('.mpkind').value=pre.kind||"";
+    if(pre.text)wrap.querySelector('.mptext').value=pre.text;
+    if(pre.origin)wrap.querySelector('.mporigin').value=pre.origin;
+    if(pre.country)wrap.querySelector('.mpcountry').value=pre.country;
+    if(pre.make)wrap.querySelector('.mpmake').value=pre.make;
+  }
+  sync();
+  return wrap;
+}
+function mpSyncEmpty(){
+  var n=document.getElementById('mpdecks').children.length;
+  document.getElementById('mpnone').style.display=n?"none":"block";
+}
+/* Reverse-map a stored deck back into editor answers so opening the panel
+   shows what the member already told us. THE PRE-SEED IS WHAT MAKES "REPLACE"
+   SAFE: nothing can be silently dropped by editing one row. */
+function mpSeed(){
+  var P=TVprofile()||{},box=document.getElementById('mpdecks'),i;
+  box.innerHTML="";
+  document.getElementById('mploc').value=P.loc||"US";
+  var dks=(P.decks&&P.decks.length&&typeof P.decks[0]==="object")?P.decks:null;
+  if(dks){
+    for(i=0;i<dks.length;i++){
+      var k=dks[i];
+      if(k.tier==="unknown"||!mpDev(k.n)){box.appendChild(mpRow({kind:"__other__",text:k.text||k.n||""}));continue;}
+      var origin=k.origin||"here",cc=k.country||"";
+      if(!k.origin){ /* a Ledger-built deck: recover the country from its regions */
+        for(var c in MPC){if(MPC.hasOwnProperty(c)&&MPC[c][0]===(k.bd||[])[0]&&MPC[c][1]===(k.dvd||[])[0]){cc=c;break;}}
+        origin=(cc&&cc!==mpHome())?"abroad":"here";
+        if(k.free)origin="multi";
+      }
+      box.appendChild(mpRow({kind:k.n,origin:origin,country:cc,make:k.make||""}));
+    }
+  }else{
+    /* a door profile: every ticked device becomes a row, bought where they
+       are - which is exactly what the floor assumes about them today, so
+       opening this panel and saving it unchanged changes nothing. */
+    var devs=P.devices||[];
+    for(i=0;i<devs.length;i++){
+      if(!mpDev(devs[i]))continue;
+      box.appendChild(mpRow({kind:devs[i],origin:(P.free===true&&!mpIsConsole(devs[i]))?"multi":"here"}));
+    }
+    if(P.other)box.appendChild(mpRow({kind:"__other__",text:P.other}));
+  }
+  mpSyncEmpty();
+}
+function mpRead(){
+  var rows=[].slice.call(document.getElementById('mpdecks').children),out=[],i;
+  for(i=0;i<rows.length;i++){
+    var r=rows[i],kind=r.querySelector('.mpkind').value;
+    if(!kind)continue;
+    if(kind==="__other__"){
+      out.push({n:"something else",tier:"unknown",bd:[],dvd:[],bdClaim:[],dvdClaim:[],
+                pal:false,free:false,text:(r.querySelector('.mptext').value||"").trim()});
+      continue;
+    }
+    var d=mpDev(kind); if(!d)continue;
+    var origin=r.querySelector('.mporigin').value;
+    var cc=(origin==="abroad")?r.querySelector('.mpcountry').value:mpHome();
+    var C=MPC[cc],bd=[],dvd=[],pal=!!d[4];
+    if(C){bd=[C[0]];dvd=[C[1]];if(C[2])pal=true;}
+    /* THE OBJECT/CLAIM LINE. "It came from Britain" is a fact about a thing and
+       widens the TRUSTED set. "I bought it to play foreign discs" is a claim
+       about what the thing does, and widens only the CLAIMED set - amber, never
+       green, until Jeff confirms it into the Ledger himself. */
+    out.push({n:kind,tier:d[2],bd:bd,dvd:dvd,
+              bdClaim:(origin==="multi"?ALLBD.slice():[]),
+              dvdClaim:(origin==="multi"?ALLDVD.slice():[]),
+              pal:pal,free:(origin==="multi"),
+              origin:origin,country:cc,make:(r.querySelector('.mpmake').value||"").trim()});
+  }
+  return out;
+}
+/* Ledger-ready. ⚠ IT NEVER WRITES "region-free" - that word in the Decks cell
+   means Jeff has confirmed it, and this string is only ever a member's answer.
+   The claim is reported to him separately, in words he has to act on. */
+function mpDecksText(dks){
+  var out=[],i;
+  for(i=0;i<dks.length;i++){
+    var k=dks[i];
+    if(k.tier==="unknown"){out.push("something else: "+(k.text||"(didn't say)"));continue;}
+    out.push(k.n+(k.country&&MPC[k.country]?" ("+MPC[k.country][3]+")":""));
+  }
+  return out.join("; ");
+}
+/* WHAT THEY HAD BEFORE, in the same words as what they have now - so the diff
+   Jeff reads is a real before-and-after. ⚠ A member editing for the FIRST time
+   has no deckstext, only the door's ticked devices, and reading that as
+   "(no players listed)" made every first edit look like they had told us
+   nothing. Fall back through the door profile before giving up. */
+function mpSummary(P){
+  if(!P)return "(nothing on file)";
+  var t=(P.deckstext||"").trim();
+  if(!t){
+    var bits=(P.devices||[]).slice();
+    if(P.other)bits.push("something else: "+P.other);
+    t=bits.join("; ");
+    if(t&&P.free===true)t+=" — said one of them plays other regions";
+  }
+  return (t||"(no players listed)")+" — "+(P.loc||"?");
+}
+function openPlayers(t,y){
+  MPSCOPE=(t?{t:t,y:String(y==null?"":y)}:null);
+  MPBEFORE=mpSummary(TVprofile());
+  document.getElementById('mpfilm').textContent = MPSCOPE
+    ? "Checking whether you can play " + MPSCOPE.t + " (" + MPSCOPE.y + ")."
+    : "What you play discs on. The floor uses this and nothing else.";
+  document.getElementById('mpafter').style.display="none";
+  mpSeed();
+  document.getElementById('mpwrap').classList.add('show');
+}
+function closePlayers(){document.getElementById('mpwrap').classList.remove('show');}
+function mpSave(){
+  var dks=mpRead(),P=TVprofile()||{},box=document.getElementById('mpdecks');
+  /* SAVING WITH NOTHING FILLED IN MUST LOSE NOTHING. Someone who opens this,
+     looks at it and saves is telling us nothing, not telling us they own
+     nothing - and the difference is a member whose whole floor turns amber. */
+  if(!dks.length && !box.children.length){closePlayers();return;}
+  var ord={none:0,unknown:0,dvd:1,bd:2,uhd:3},best="none",i,anyKnown=false;
+  for(i=0;i<dks.length;i++){
+    if(dks[i].tier==="unknown")continue;
+    anyKnown=true;
+    if((ord[dks[i].tier]||0)>(ord[best]||0))best=dks[i].tier;
+  }
+  if(!anyKnown)best=dks.length?"unknown":"none";
+  var text=mpDecksText(dks);
+  TVsave({name:P.name||"(unsigned)",loc:document.getElementById('mploc').value,
+          player:best,decks:dks,deckstext:text,devices:(P.devices||[]),
+          other:(P.other||""),ship:(P.ship||"meet"),src:"self"});
+  if(typeof repaintPlay==='function')repaintPlay();
+  if(typeof renderFloor==='function')renderFloor();
+  var after=mpSummary(TVprofile()),claim=false;
+  for(i=0;i<dks.length;i++){if(dks[i].free||dks[i].tier==="unknown")claim=true;}
+  if(after!==MPBEFORE||claim){
+    var a=document.getElementById('mpafter');
+    a.innerHTML="Saved &mdash; the floor has been redrawn. "+
+      (claim?"Some of that the management has to confirm before the floor can promise it. ":"")+
+      '<a href="#" data-mptell="1">Want the management to have this on file?</a>';
+    a.style.display="block";
+  }else{closePlayers();}
+}
+function mpTellText(){
+  var P=TVprofile()||{},dks=(P.decks&&typeof P.decks[0]==="object")?P.decks:[],i,out=[];
+  out.push("MY PLAYERS — an update from the floor");
+  out.push("WAS:  "+(MPBEFORE||"(nothing on file)"));
+  out.push("NOW:  "+mpSummary(P));
+  out.push("");
+  out.push("FOR THE LEDGER (Decks):  "+((P.deckstext||"").trim()||"(nothing)"));
+  for(i=0;i<dks.length;i++){
+    var k=dks[i],bits=[];
+    if(k.make)bits.push("make/model: "+k.make);
+    if(k.free)bits.push("SAYS IT PLAYS OTHER COUNTRIES' DISCS — not confirmed, so the floor still says 'not sure'");
+    if(k.tier==="unknown")bits.push("couldn't be identified");
+    if(bits.length)out.push("  • "+(k.n||"?")+" — "+bits.join("; "));
+  }
+  return out.join("\n");
+}
 /* ---------- slip (request + question) ---------- */
 var slipMode='request',slipFilm=null;
 function slipItems(){ return slipFilm?[slipFilm]:CART.slice(); }
