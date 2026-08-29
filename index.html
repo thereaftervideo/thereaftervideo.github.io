@@ -428,15 +428,20 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 /* ---------- phones ---------- */
 @media(max-width:600px){
   nav{gap:6px 13px;padding:8px 13px}
+  /* TWO DESIGNED ROWS, not a wrap that happens to fit (Jeff, Aug 28, option B).
+     Row 1 is type: the wordmark and the two browse links. Row 2 is buttons:
+     SEARCH, MY PLAYERS, CART - one height, reading as a toolbar. .sep2 becomes
+     a full-width break between them, so the split is explicit, never width-luck
+     (width-luck is what stranded THE FLOOR at the end of row 1). */
   nav .mini{order:1;font-size:13px}
-  nav .sep2{order:2}
-  .navsearch{order:3;padding:5px 11px;font-size:10.5px;gap:6px}
-  nav a{order:4;font-size:10.5px;letter-spacing:.07em}
+  nav a{order:2;font-size:10.5px;letter-spacing:.07em}
+  nav .sep2{order:3;flex:0 0 100%;height:0}
+  .navsearch{order:4;padding:5px 11px;font-size:10.5px;gap:6px}
   /* ⚠ THE PHONE NAV ORDERS EVERY ITEM EXPLICITLY, so anything without an
-     `order` falls to 0 and sorts AHEAD OF THE WORDMARK once the bar wraps.
-     MY PLAYERS did exactly that, and CART would have done the same the first
-     time anyone put something in it - the bug was already there, unseen,
-     because the cart is hidden while it is empty. Both carry .navcart. */
+     `order` falls to 0 and sorts AHEAD OF THE WORDMARK. MY PLAYERS did exactly
+     that, and CART had it latently while the cart was hidden - both carry
+     .navcart. A NEW NAV ITEM NEEDS AN ORDER **AND A ROW**: 1-2 is the type
+     row, 4-5 the button row, 3 is the break. */
   .navcart{order:5}
   .wrap{padding:0 14px}
   header{padding:34px 0 4px}
@@ -447,6 +452,12 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
   .slip{padding:20px 18px}
   .titlecard{padding:22px 20px}
   .titlecard img.tccov{width:104px;margin-left:11px}
+}
+/* the narrowest phones (SE class): the button row is ~6px too wide at 13px
+   gaps - tighten so CART never wraps to a third row */
+@media(max-width:340px){
+  nav{gap:6px 8px}
+  .navsearch{padding:5px 8px}
 }
 
 /* ---------- playability layer ---------- */
