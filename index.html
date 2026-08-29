@@ -341,8 +341,17 @@ h2 .tick{color:var(--amber)}
 /* slip */
 .slip{background:var(--paper);color:var(--paper-ink);max-width:470px;width:100%;padding:24px 26px;
   font-family:"Special Elite",Courier,monospace;box-shadow:0 10px 40px rgba(0,0,0,.6);transform:rotate(-.4deg);
-  max-height:88vh;overflow:auto}
-.slip h3{margin:0 0 4px;font-size:17px;letter-spacing:.06em;font-weight:400}
+  max-height:88vh;overflow:auto;position:relative}
+/* The slip had no X. Its three exits were "never mind" (below every send button),
+   a backdrop click (invisible) and Escape (no keyboard on a phone) - so on the
+   device most people use it, the only findable way out was to scroll past the
+   whole form. Chris reported it. The title card and the cart both already carry
+   this exact control, which is why its absence here read as a trap. Extra padding
+   over the titlecard's version: this one gets tapped with a thumb. */
+.slip .x{position:absolute;top:8px;right:10px;background:none;border:none;color:#6d6455;
+  font-size:22px;line-height:1;cursor:pointer;font-family:inherit;padding:6px 9px}
+.slip .x:hover{color:var(--paper-ink)}
+.slip h3{margin:0 0 4px;font-size:17px;letter-spacing:.06em;font-weight:400;padding-right:34px}
 .slip .film{font-size:14px;margin:0 0 14px;border-bottom:1px dashed #9b917d;padding-bottom:10px}
 .slip label{display:block;font-size:12.5px;margin:12px 0 4px;letter-spacing:.04em}
 .slip input,.slip select,.slip textarea{width:100%;border:1px solid #9b917d;background:#efe8d6;color:var(--paper-ink);
@@ -696,6 +705,7 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 </div>
 <div class="slipwrap" id="slipwrap" role="dialog" aria-modal="true" aria-label="Store slip">
   <div class="slip">
+    <button class="x" id="slipx" aria-label="Close this slip">&times;</button>
     <h3 id="sliphead">RENTAL REQUEST SLIP</h3>
     <p class="film" id="slipfilm"></p>
     <label for="memname">MEMBER NAME</label>
@@ -2351,11 +2361,18 @@ document.getElementById('slipcopy').addEventListener('click',function(){
     });
   }else fail();
 });
-document.getElementById('slipnah').addEventListener('click',function(){
+/* Four ways out of the slip: the X, "never mind", the backdrop, Escape. They all
+   route through here on purpose. This project's recurring bug is two code paths
+   reaching the same state with only one of them doing the work (MEMBER: (unsigned),
+   omenFor, the door IIFE) - so closing the slip is one function, not four copies.
+   Function declaration, not a var, per the standing template rule. */
+function closeSlip(){
   document.getElementById('slipwrap').classList.remove('show');
-});
+}
+document.getElementById('slipx').addEventListener('click',closeSlip);
+document.getElementById('slipnah').addEventListener('click',closeSlip);
 document.getElementById('slipwrap').addEventListener('click',function(e){
-  if(e.target===this)this.classList.remove('show');
+  if(e.target===this)closeSlip();
 });
 
 /* ---------- global clicks ---------- */
@@ -2388,7 +2405,7 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
-  if(document.getElementById('slipwrap').classList.contains('show'))document.getElementById('slipwrap').classList.remove('show');
+  if(document.getElementById('slipwrap').classList.contains('show'))closeSlip();
   else if(document.getElementById('titlewrap').classList.contains('show'))closeTitle();
 });
 
