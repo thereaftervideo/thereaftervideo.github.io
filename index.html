@@ -381,17 +381,15 @@ a.setb.lnk:hover{border-color:var(--amber);background:rgba(224,182,74,.12)}
   font-family:inherit;font-size:14px;letter-spacing:.06em;cursor:pointer;border-radius:2px}
 .slip .go2:hover{background:rgba(43,38,32,.08)}
 /* on a phone the OS mail app is the reliable route, so it leads; on desktop Gmail-web does */
-#slipmailbtn,#slipgmailapp{display:none}
-.slip.mobile #slipmailbtn{display:block}
-.slip.ios #slipgmailapp{display:block;background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink)}
-.slip.ios #slipgmailapp:hover{background:rgba(43,38,32,.08)}
-.slip.ios #slipgmail{flex-basis:100%}
-.slip.mobile #slipgmail{background:none;border:1.5px solid var(--paper-ink);color:var(--paper-ink)}
-.slip.mobile #slipgmail:hover{background:rgba(43,38,32,.08)}
-.slip.mobile #altsep,.slip.mobile #slipmail{display:none}
-.iostip{display:none;margin:12px 0 0;padding:10px 12px;border:1px dashed #9b917d;border-radius:2px;
-  font-size:11.5px;line-height:1.55;color:#4a4335;background:rgba(155,145,125,.13)}
-.slip.ios .iostip{display:block}
+.slip .go[disabled]{opacity:.55;cursor:default}
+.slip .lnk{background:none;border:none;padding:0;color:#4a4335;font-family:inherit;font-size:12px;
+  text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
+.slip .lnk:hover{color:var(--paper-ink)}
+.slip .lbl2{color:#6d6455;letter-spacing:0}
+.slip input.err{border-color:#a0402c;background:#f3e2dc}
+.slip .slipstate{display:none;margin-top:11px;padding:9px 11px;border-radius:2px;font-size:12.5px;line-height:1.5}
+.slip .slipstate.ok{display:block;background:#2f4a2c;color:#e9f0e4}
+.slip .slipstate.bad{display:block;background:#5a2e22;color:#f3e6dd}
 .slip .alt{display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;margin-top:11px;font-size:12px;color:#6d6455}
 /* MY PLAYERS - the setup sheet. Deliberately built on .slip: same paper, same
    X, same scroll behaviour, so it is a thing this store already does rather
@@ -790,6 +788,8 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
     <label for="memname">MEMBER NAME</label>
     <input id="memname" list="members" placeholder="member name">
     <datalist id="members"></datalist>
+    <label for="mememail">EMAIL <span class="lbl2">&mdash; the confirmation goes here</span></label>
+    <input id="mememail" type="email" placeholder="you@wherever.com" autocomplete="email" inputmode="email">
     <div id="reqfields">
       <label for="handoff">PICKUP</label>
       <select id="handoff">
@@ -807,27 +807,27 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <label for="slipnote">NOTE TO THE MANAGEMENT (optional)</label>
       <textarea id="slipnote" placeholder="optional"></textarea>
     </div>
-    <p id="slipclear">Sent it? <button type="button" id="slipclearbtn">Empty the cart</button></p>
     <div id="qfields" style="display:none">
       <label for="slipq">YOUR QUESTION</label>
       <textarea id="slipq" placeholder="what do you want to know"></textarea>
     </div>
+    <!-- ONE WAY TO SEND (Aug 29). The slip posts itself to the store's form in the
+         background; the member needs no mail app. The mail-app / Gmail / Outlook
+         button dance existed only because mailto was the primary channel. One
+         mailto stays as the fallback for a member who is offline or a form that
+         is down. -->
     <div class="acts">
-      <a class="go" id="slipmailbtn" href="#">OPEN IN MAIL</a>
-      <a class="go" id="slipgmailapp" href="#">GMAIL APP</a>
-      <a class="go" id="slipgmail" href="#" target="_blank" rel="noopener">SEND WITH GMAIL</a>
-      <button class="go2" id="slipcopy">COPY THE SLIP</button>
+      <button type="button" class="go" id="slipsend">SEND THE SLIP</button>
     </div>
+    <div class="slipstate" id="slipstate" aria-live="polite"></div>
     <div class="alt">
-      <span>not Gmail?</span>
-      <a id="slipoutlook" href="#" target="_blank" rel="noopener">Outlook</a>
+      <a id="slipmail" href="#">or email it instead</a>
       <span id="altsep">&middot;</span>
-      <a id="slipmail" href="#">your mail app</a>
+      <button type="button" class="lnk" id="slipcopy">copy the slip</button>
       <button class="nah" id="slipnah">never mind</button>
     </div>
-    <p class="iostip" id="iostip"><b>On iPhone:</b> GMAIL APP jumps straight into Gmail &mdash; make sure it's installed, or iOS will complain. OPEN IN MAIL uses whatever mail app you've set as default; to make that Gmail permanently, it's <b>Settings &rsaquo; Apps &rsaquo; Mail &rsaquo; Default Mail App &rsaquo; Gmail</b>. One time, then it sticks.</p>
     <div class="copied" id="slipcopied"></div>
-    <p class="addr">Any of these just writes the email for you. However it goes, it ends up at<br><b id="storeaddr"></b></p>
+    <p class="addr" id="slipaddr">You'll get a confirmation email at <b id="echoemail">the address above</b>. If it doesn't arrive, reach out to Jeff.</p>
     <p class="fine" id="slipfine">All rentals require management approval. You'll hear back.</p>
   </div>
 </div>
@@ -1416,8 +1416,12 @@ The Adventures of Tintin,Steven Spielberg,2011,Blu Ray,Paramount,,,,2026-08-29,B
 "use strict";
 /* assembled at runtime so address-harvesting crawlers don't find it in the source */
 var STORE_EMAIL="thereaftervideo"+String.fromCharCode(64)+"gmail"+String.fromCharCode(46)+"com";
+/* The store's slip form (Google Forms as plumbing; the member never sees it).
+   Not a secret: a form URL is meant to be public. Field ids come from
+   _forms-config.json in /Movies; the Apps Script behind the form emails the
+   store and the member. Anyone can post junk here - same trust as the inbox. */
+var SLIP_FORM={"url":"https://docs.google.com/forms/d/e/1FAIpQLSfTjrKu47KoROc34ZljdlmgSti10YjxeMm-8_NNQCLvr-rHog/formResponse","f":{"Type":"entry.1233165244","Member":"entry.2050969784","Email":"entry.1575055626","Titles":"entry.27567276","Pickup":"entry.826469669","How long":"entry.710562375","Note":"entry.501745734","Question":"entry.2067672855","Setup":"entry.1076802493","Was":"entry.818222087","Now":"entry.1147327917","Decks":"entry.734630777","Slip":"entry.2120482236"}};
 var CONFIG=JSON.parse(document.getElementById('config').textContent);
-(function(){var e=document.getElementById('storeaddr');if(e)e.textContent=STORE_EMAIL;})();
 
 /* ---------- front door ----------
    A doormat, not a lock: the catalog ships inside this file, so anyone determined
@@ -1841,8 +1845,10 @@ function playWhy(d){
   return '<span class="playwhy '+(r.v==="red"?"":"amber")+'"><b>'+head+'</b>'+esc(body)+
     '<br><a href="#" data-mpopen="'+qy+'">Check that you can play this disc</a> &mdash; or '+
     '<a href="#" data-mpask="'+qy+'">ask the management</a>.'+
-    '<br><a href="'+disputeMail(d,r)+'">that’s not right &mdash; tell the management</a></span>';
+    '<br><a href="#" data-mpdispute="'+qy+'|'+encodeURIComponent(r&&r.why?r.why:"")+'">that’s not right &mdash; tell the management</a></span>';
 }
+/* disputeMail() is dormant since Aug 29: the link above opens the question slip
+   (type "dispute") so it posts like everything else. Kept for reference. */
 function disputeMail(d,r){
   return "mailto:"+STORE_EMAIL+"?subject="+encodeURIComponent("PLAYBACK DISPUTE \u2014 "+d.movie+" ("+d.year+")")+
     "&body="+encodeURIComponent(
@@ -1924,7 +1930,7 @@ function mpTellOpen(){
   document.addEventListener('keydown',function(e){
     if(e.key==="Escape"&&w.classList.contains('show'))closePlayers();});
   document.addEventListener('click',function(e){
-    var a=e.target.closest?e.target.closest('[data-mpopen],[data-mpask],[data-mptell],[data-tvset]'):null;
+    var a=e.target.closest?e.target.closest('[data-mpopen],[data-mpask],[data-mpdispute],[data-mptell],[data-tvset]'):null;
     if(!a)return;
     e.preventDefault();
     if(a.hasAttribute('data-tvset')){
@@ -1940,6 +1946,13 @@ function mpTellOpen(){
       var q=(a.getAttribute('data-mpask')||"").split("|");
       closePlayers();
       openSlip('question', q[0]?decodeURIComponent(q[0]):null, q[1]?decodeURIComponent(q[1]):null);
+    }else if(a.hasAttribute('data-mpdispute')){
+      var dq=(a.getAttribute('data-mpdispute')||"").split("|");
+      closePlayers();
+      if(typeof closeTitle==='function')closeTitle();
+      openSlip('question', dq[0]?decodeURIComponent(dq[0]):null, dq[1]?decodeURIComponent(dq[1]):null, 'dispute');
+      var dta=document.querySelector('#qfields textarea');
+      if(dta){dta.value="THE FLOOR SAID: "+(dq[2]?decodeURIComponent(dq[2]):"")+"\n\nWHAT I ACTUALLY HAVE:\n"; updateMailto();}
     }else{
       mpTellOpen();
     }
@@ -2438,9 +2451,6 @@ function closeCart(){ document.getElementById('cartwrap').classList.remove('show
   });
   document.getElementById('cartclr').addEventListener('click',cartClear);
   document.getElementById('cartgo').addEventListener('click',function(){ closeCart(); openSlip('request'); });
-  document.getElementById('slipclearbtn').addEventListener('click',function(){
-    cartClear(); document.getElementById('slipwrap').classList.remove('show');
-  });
 })();
 
 /* ---------- MY PLAYERS - the setup sheet ----------
@@ -2669,8 +2679,14 @@ function mpSave(){
   var after=mpSummary(TVprofile()),claim=false;
   for(i=0;i<dks.length;i++){if(dks[i].free||dks[i].tier==="unknown")claim=true;}
   if(after!==MPBEFORE||claim){
+    /* AUTO WRITE-BACK (Jeff, Aug 28): a save reaches the management even if
+       the member never sends a slip. Quiet POST, but SAID on the page - the
+       transparency middle path. No receipt email for write-backs. */
+    var wb=slipPost({Type:"writeback",Member:(TVprofile()||{}).name||"",Email:slipEmailOnFile(),
+      Was:MPBEFORE||"(nothing on file)",Now:after,Decks:(TVprofile()||{}).deckstext||"",Slip:mpTellText()});
     mpConfirm("Saved \u2014 the floor has been redrawn to what you can play."+
-      (claim?" Some of it the management has to confirm before the floor can promise it.":""),true);
+      (claim?" Some of it the management has to confirm before the floor can promise it.":"")+
+      (wb?" A note of the change has gone to the management.":""),true);
   }else{
     mpConfirm("Saved \u2014 nothing changed, so the floor stands as it was.",false);
   }
@@ -2694,8 +2710,10 @@ function mpTellText(){
 /* ---------- slip (request + question) ---------- */
 var slipMode='request',slipFilm=null;
 function slipItems(){ return slipFilm?[slipFilm]:CART.slice(); }
-function openSlip(mode,t,y){
-  slipMode=mode;slipFilm=t?{t:t,y:String(y==null?"":y)}:null;
+var slipKind=null; /* "dispute" when the slip was opened from a that's-not-right link */
+function openSlip(mode,t,y,kind){
+  slipMode=mode;slipFilm=t?{t:t,y:String(y==null?"":y)}:null;slipKind=kind||null;
+  slipResetSend();
   document.getElementById('sliphead').textContent=mode==='request'?"RENTAL REQUEST SLIP":"QUESTION FOR THE MANAGEMENT";
   var items=slipItems();
   document.getElementById('slipfilm').textContent=
@@ -2703,10 +2721,9 @@ function openSlip(mode,t,y){
     : (slipFilm ? slipFilm.t+" ("+slipFilm.y+")"
        : items.length ? items.length+(items.length===1?" title":" titles")+" \u2014 "+items.map(function(x){return x.t;}).join(", ")
        : "Nothing in the cart yet");
-  document.getElementById('slipclear').classList.toggle('on', mode==='request' && !slipFilm && items.length>0);
   document.getElementById('reqfields').style.display=mode==='request'?"block":"none";
   document.getElementById('qfields').style.display=mode==='question'?"block":"none";
-  document.getElementById('slipcopy').textContent="COPY THE SLIP";
+  document.getElementById('slipcopy').textContent="copy the slip";
   var cp=document.getElementById('slipcopied'); cp.classList.remove('show'); cp.innerHTML="";
   updateMailto();
   document.getElementById('slipwrap').classList.add('show');
@@ -2724,7 +2741,10 @@ function profileBlock(){
   var SHIP={meet:"can meet up for a hand-off",
             ship:"needs shipping \u2014 will pay both ways",
             noship:"shipping doesn't work for them"};
-  var plays=(P.devices&&P.devices.length)?P.devices.join(", ")
+  /* MY PLAYERS writes deckstext (the objects, with where each came from);
+     the door writes devices[]. Prefer the richer one. */
+  var plays=(P.deckstext&&String(P.deckstext).trim())?String(P.deckstext).trim()
+            :(P.devices&&P.devices.length)?P.devices.join(", ")
             :(TIER[P.player]||P.player||"not given");
   var free=(P.free===true)?"Yes":(P.free===false?"No":"not asked");
   var src=(P.src==="ledger")?"from the Ledger":"self-reported";
@@ -2770,41 +2790,25 @@ function slipText(){
       "QUESTION:\n"+(qq||"")+"\n"+
       "--------------------------------------\n"};
 }
+/* updateMailto() keeps its name - a dozen callers - but now it only refreshes
+   the ONE fallback mailto link and the confirmation-address echo. */
 function updateMailto(){
   var s=slipText();
-  var su=encodeURIComponent(s.subject), bo=encodeURIComponent(s.body);
-  var mt="mailto:"+STORE_EMAIL+"?subject="+su+"&body="+bo;
-  document.getElementById('slipmail').setAttribute('href',mt);
-  document.getElementById('slipmailbtn').setAttribute('href',mt);
-  /* iOS Gmail app scheme — only surfaced on iOS, and the tip warns it needs the app */
-  document.getElementById('slipgmailapp').setAttribute('href',
-    "googlegmail:///co?to="+encodeURIComponent(STORE_EMAIL)+"&subject="+su+"&body="+bo);
-  document.getElementById('slipgmail').setAttribute('href',
-    "https://mail.google.com/mail/?view=cm&fs=1&tf=1&to="+encodeURIComponent(STORE_EMAIL)+"&su="+su+"&body="+bo);
-  document.getElementById('slipoutlook').setAttribute('href',
-    "https://outlook.live.com/mail/0/deeplink/compose?to="+encodeURIComponent(STORE_EMAIL)+"&subject="+su+"&body="+bo);
+  document.getElementById('slipmail').setAttribute('href',
+    "mailto:"+STORE_EMAIL+"?subject="+encodeURIComponent(s.subject)+"&body="+encodeURIComponent(s.body));
+  var em=document.getElementById('mememail').value.trim();
+  document.getElementById('echoemail').textContent=em||"the address above";
 }
-['memname','handoff','slipnote','slipq'].forEach(function(id){
+['memname','mememail','handoff','slipnote','slipq'].forEach(function(id){
   document.getElementById(id).addEventListener('input',updateMailto);
   document.getElementById(id).addEventListener('change',updateMailto);
 });
 function rememberMember(){
-  try{localStorage.setItem('tv-member',document.getElementById('memname').value.trim());}catch(e){}
+  try{localStorage.setItem('tv-member',document.getElementById('memname').value.trim());
+      localStorage.setItem('tv-email',document.getElementById('mememail').value.trim());}catch(e){}
   updateMailto();
 }
-['slipmail','slipmailbtn','slipgmailapp','slipgmail','slipoutlook'].forEach(function(id){
-  document.getElementById(id).addEventListener('click',rememberMember);
-});
-/* Phones: the OS mail app handles mailto: and lands in whatever app the member
-   actually uses (Gmail included, if it's their default), so it leads there. */
-(function(){
-  var coarse=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;
-  var ua=navigator.userAgent;
-  var ios=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&'ontouchend'in document);
-  if(coarse||/Android/i.test(ua)||ios)
-    document.querySelector('.slip').classList.add('mobile');
-  if(ios)document.querySelector('.slip').classList.add('ios');
-})();
+document.getElementById('slipmail').addEventListener('click',rememberMember);
 function showCopied(html){
   var p=document.getElementById('slipcopied');
   p.innerHTML=html; p.classList.add('show');
@@ -2813,13 +2817,16 @@ document.getElementById('slipcopy').addEventListener('click',function(){
   rememberMember();
   var s=slipText();
   var full="TO: "+STORE_EMAIL+"\nSUBJECT: "+s.subject+"\n\n"+s.body;
+  if(document.getElementById('slipsend').textContent.indexOf("SENT")===0){
+    try{full=localStorage.getItem('tv-lastslip')||full;}catch(e){}
+  }
   var btn=this;
   function ok(){
-    btn.textContent="COPIED ✓";
+    btn.textContent="copied \u2713";
     showCopied("Slip copied. Paste it into an email to <b>"+STORE_EMAIL+"</b> from wherever you read your mail.");
   }
   function fail(){
-    btn.textContent="COPY THE SLIP";
+    btn.textContent="copy the slip";
     showCopied("Couldn't reach the clipboard — select the text below and copy it, then mail it to <b>"+STORE_EMAIL+"</b>.");
     var ta=document.createElement('textarea');
     ta.value=full; ta.rows=8;
@@ -2848,6 +2855,94 @@ document.getElementById('slipcopy').addEventListener('click',function(){
 function closeSlip(){
   document.getElementById('slipwrap').classList.remove('show');
 }
+
+/* ---------- SENDING THE SLIP (Aug 29) ----------
+   The slip posts its fields to the store's Google Form in the background
+   (no-cors: the page cannot read the answer). What the page CAN tell apart:
+     - the request never got an answer  -> "couldn't confirm", never "failed",
+       because a lost reply after Google recorded it is possible; a duplicate
+       is the accepted cost, a lost slip is not.
+     - Google answered something        -> "sent". A closed form would also look
+       like this, which is why the confirmation EMAIL is the only real receipt
+       and the page says so.
+   The slip text is kept locally after a send so "copy it / email it" still
+   works if the confirmation never arrives. Function declarations throughout. */
+function slipEmailOnFile(){
+  try{return (localStorage.getItem('tv-email')||"").trim();}catch(e){return "";}
+}
+function slipEmailValid(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||""); }
+function slipFields(){
+  var s=slipText(), items=slipItems();
+  var name=document.getElementById('memname').value.trim();
+  var email=document.getElementById('mememail').value.trim();
+  var f={Type:slipMode==='request'?"request":(slipKind==='dispute'?"dispute":"question"),
+         Member:name, Email:email,
+         Titles:items.map(function(it){return it.t+(it.y?" ("+it.y+")":"");}).join("\n"),
+         Pickup:"",'How long':"",Note:"",Question:"",Setup:profileBlock().trim(),
+         Was:"",Now:"",Decks:"",Slip:s.body};
+  if(slipMode==='request'){
+    f.Pickup=document.getElementById('handoff').value;
+    f['How long']=document.getElementById('howlong').value;
+    f.Note=document.getElementById('slipnote').value.trim();
+  }else{
+    var q=document.getElementById('slipq').value.trim(); f.Question=q;
+    /* a tell-the-management slip carries the MY PLAYERS diff; lift it into columns */
+    var mw=/^WAS:\s*(.*)$/m.exec(q), mn=/^NOW:\s*(.*)$/m.exec(q), md=/^FOR THE LEDGER \(Decks\):\s*(.*)$/m.exec(q);
+    if(mw)f.Was=mw[1].trim(); if(mn)f.Now=mn[1].trim(); if(md)f.Decks=md[1].trim();
+    if(mw||mn||md)f.Type="writeback";
+  }
+  return f;
+}
+/* Background POST. Returns the fetch promise, or null if the form isn't configured. */
+function slipPost(fields){
+  if(!SLIP_FORM||!SLIP_FORM.url||!window.fetch||!window.FormData)return null;
+  var fd=new FormData(), k;
+  for(k in SLIP_FORM.f){ if(fields[k]!=null&&fields[k]!=="")fd.append(SLIP_FORM.f[k],String(fields[k])); }
+  try{ return fetch(SLIP_FORM.url,{method:"POST",mode:"no-cors",body:fd}); }catch(e){ return Promise.reject(e); }
+}
+function slipState(kind,html){
+  var st=document.getElementById('slipstate');
+  st.className="slipstate"+(kind?" "+kind:""); st.innerHTML=html||"";
+}
+function slipResetSend(){
+  var b=document.getElementById('slipsend'); b.disabled=false; b.textContent="SEND THE SLIP";
+  slipState(null,"");
+  document.getElementById('mememail').classList.remove('err');
+  document.getElementById('memname').classList.remove('err');
+  var cp=document.getElementById('slipcopied'); if(cp){cp.classList.remove('show');cp.innerHTML="";}
+}
+function slipSend(){
+  var b=document.getElementById('slipsend');
+  var name=document.getElementById('memname'), em=document.getElementById('mememail');
+  var bad=false;
+  if(!name.value.trim()){name.classList.add('err');bad=true;}else name.classList.remove('err');
+  if(!slipEmailValid(em.value.trim())){em.classList.add('err');bad=true;}else em.classList.remove('err');
+  if(slipMode==='request'&&!slipItems().length){slipState('bad',"Nothing in the cart yet \u2014 add a title first.");return;}
+  if(bad){slipState('bad',"Your name and an email address, please \u2014 the confirmation has nowhere to go without them.");
+    (name.value.trim()?em:name).focus();return;}
+  rememberMember();
+  var fields=slipFields(), s=slipText();
+  try{localStorage.setItem('tv-lastslip',"TO: "+STORE_EMAIL+"\nSUBJECT: "+s.subject+"\n\n"+s.body);}catch(e){}
+  b.disabled=true; b.textContent="SENDING\u2026"; slipState(null,"");
+  function couldnt(){
+    b.disabled=false; b.textContent="TRY AGAIN";
+    slipState('bad',"We couldn\u2019t confirm that went through"+(navigator.onLine===false?" \u2014 you look to be offline":"")+
+      ". Try again in a moment, or use <b>or email it instead</b> below. If a confirmation email arrives anyway, it went through and you can ignore this.");
+  }
+  if(navigator.onLine===false){couldnt();return;}
+  var p=slipPost(fields);
+  if(!p){couldnt();return;}
+  p.then(function(){
+    b.textContent="SENT \u2713";
+    var wasCart=(slipMode==='request'&&!slipFilm);
+    if(wasCart&&typeof cartClear==='function')cartClear();
+    slipState('ok',"Sent. A confirmation is on its way to <b>"+esc(fields.Email)+"</b>"+
+      (wasCart?" and the cart has been emptied":"")+". If nothing arrives, reach out to Jeff \u2014 the slip is saved here in the meantime (<b>copy the slip</b> below).");
+  },function(){couldnt();});
+}
+document.getElementById('slipsend').addEventListener('click',slipSend);
+/* Prefill the email the way the name is prefilled: typed once, remembered. */
+try{var _em=localStorage.getItem('tv-email'); if(_em)document.getElementById('mememail').value=_em;}catch(e){}
 document.getElementById('slipx').addEventListener('click',closeSlip);
 document.getElementById('slipnah').addEventListener('click',closeSlip);
 document.getElementById('slipwrap').addEventListener('click',function(e){
