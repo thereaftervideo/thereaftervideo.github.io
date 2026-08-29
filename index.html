@@ -406,8 +406,11 @@ a.setb.lnk:hover{border-color:var(--amber);background:rgba(224,182,74,.12)}
 .mprow label:first-of-type{margin-top:0}
 .mpn{font-size:11px;letter-spacing:.06em;color:#6d6455;margin:0 0 2px}
 #mpadd{margin-top:2px;width:100%}
-#mpafter{margin-top:14px;border-top:1px dashed #9b917d;padding-top:11px;font-size:12.5px}
-#mpafter a{color:var(--paper-ink)}
+/* SAVE must never scroll below the panel's fold - same reason .cback .acts2
+   is sticky: with a real profile (four decks) the panel is taller than a
+   phone viewport, and a SAVE below the fold reads as a dead button. */
+#mpwrap .acts{position:sticky;bottom:0;background:var(--paper);z-index:2;margin-top:14px;
+  padding:10px 0 2px;box-shadow:0 -7px 9px -7px rgba(43,38,32,.35)}
 .slip .alt a{color:#4a4335;text-decoration:underline;text-decoration-style:dotted;cursor:pointer}
 .slip .alt a:hover{color:var(--paper-ink)}
 .slip .nah{background:none;border:none;color:#6d6455;padding:0;margin-left:auto;
@@ -602,17 +605,17 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
 
 <nav>
   <span class="mini">THEREAFTER <span>VIDEO</span></span>
-  <a href="#shelfsec">THE SHELF</a>
+  <!-- THE SHELF / THE LEDGER left the nav Aug 29 2026 (Jeff): both are
+       scroll-to sections, not destinations. Removed desktop AND phone. -->
   <a href="#floorsec">THE FLOOR</a>
   <a id="navsets">BOX SETS</a>
-  <a href="#ledgersec">THE LEDGER</a>
   <span class="sep2"></span>
   <button class="navsearch" id="navsearch" title="Search the floor">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="4.4"></circle><path d="M9.4 9.4L13 13" stroke-linecap="round"></path></svg>
     SEARCH
   </button>
   <button class="navcart on" id="navplayers" title="What you play discs on">MY PLAYERS</button>
-  <button class="navcart" id="navcart" title="Your cart">CART <span id="cartn">0</span></button>
+  <button class="navcart" id="navcart" title="Your cart">CART (<span id="cartn">0</span>)</button>
 </nav>
 <div class="wrap">
 <header>
@@ -766,7 +769,6 @@ footer{margin:64px 0 40px;text-align:center;font-family:"Special Elite",Courier,
       <button type="button" class="go" id="mpsave">SAVE</button>
       <button type="button" class="go2" id="mpcancel">never mind</button>
     </div>
-    <div id="mpafter" style="display:none"></div>
   </div>
 </div>
 <div class="slipwrap" id="slipwrap" role="dialog" aria-modal="true" aria-label="Store slip">
@@ -1853,13 +1855,49 @@ function updateSetupBar(){
   if(dismissed){bar.classList.remove('on');return;}
   document.getElementById('setupbartext').textContent=
     "There are discs here from all over the world, in every format. If you want the floor to be exact about yours, click MY PLAYERS at the top.";
+  setupBarNudge();
   bar.classList.add('on');
 }
-(function(){
+/* The bar's two buttons in nudge mode. A FUNCTION DECLARATION (house rule),
+   because mpConfirm() borrows the same buttons for the save confirmation and
+   must be able to hand them back. */
+function setupBarNudge(){
   var go=document.getElementById('setupbargo'),x=document.getElementById('setupbarx');
-  if(go){go.textContent="MY PLAYERS";go.onclick=function(){openPlayers();};}
-  if(x)x.onclick=function(){try{localStorage.setItem('tv-setupbar-x','1');}catch(e){}updateSetupBar();};
-})();
+  if(go){go.style.display="";go.textContent="MY PLAYERS";go.onclick=function(){openPlayers();};}
+  if(x){x.textContent="not now";
+    x.onclick=function(){try{localStorage.setItem('tv-setupbar-x','1');}catch(e){}updateSetupBar();};}
+}
+setupBarNudge();
+/* THE SAVE CONFIRMATION lives here, in the setup bar at the top of the floor -
+   never inside the panel. Save closes the panel (the floor repainting IS the
+   confirmation); this strip says it in words and carries the tell-the-management
+   offer, non-modal, able to trap nobody. It scrolls itself into view unless a
+   title card is open in front of it - there the repainted badge is the
+   confirmation and the strip waits underneath. */
+function mpConfirm(msg,offerTell){
+  var bar=document.getElementById('setupbar'); if(!bar)return;
+  document.getElementById('setupbartext').textContent=msg;
+  var go=document.getElementById('setupbargo'),x=document.getElementById('setupbarx');
+  if(go){go.style.display=offerTell?"":"none";
+    if(offerTell){go.textContent="SEND IT TO THE MANAGEMENT";go.onclick=mpTellOpen;}}
+  if(x){x.textContent="dismiss";
+    x.onclick=function(){bar.classList.remove('on');setupBarNudge();};}
+  bar.classList.add('on');
+  if(!document.getElementById('titlewrap').classList.contains('show'))
+    bar.scrollIntoView({behavior:'smooth',block:'center'});
+}
+/* The tell-the-management route, shared by the strip and any [data-mptell]
+   link: the EXISTING question slip carrying the WAS/NOW diff. No new
+   machinery, and the slip attaches their setup anyway. */
+function mpTellOpen(){
+  var bar=document.getElementById('setupbar');
+  if(bar){bar.classList.remove('on');setupBarNudge();}
+  closePlayers();
+  openSlip('question',null,null);
+  var ta=document.querySelector('#qfields textarea');
+  if(ta){ta.value=mpTellText();
+    if(typeof updateMailto==='function')updateMailto();}
+}
 /* THE PANEL'S WIRING. Delegated, because the page's JS runs in a closure and
    nothing here is on window - an inline onclick in card HTML cannot reach it. */
 (function(){
@@ -1892,11 +1930,7 @@ function updateSetupBar(){
       closePlayers();
       openSlip('question', q[0]?decodeURIComponent(q[0]):null, q[1]?decodeURIComponent(q[1]):null);
     }else{
-      closePlayers();
-      openSlip('question',null,null);
-      var ta=document.querySelector('#qfields textarea');
-      if(ta){ta.value=mpTellText();
-        if(typeof updateMailto==='function')updateMailto();}
+      mpTellOpen();
     }
   });
 })();
@@ -2587,7 +2621,6 @@ function openPlayers(t,y){
   document.getElementById('mpfilm').textContent = MPSCOPE
     ? "Checking whether you can play " + MPSCOPE.t + " (" + MPSCOPE.y + ")."
     : "What you play discs on. The floor uses this and nothing else.";
-  document.getElementById('mpafter').style.display="none";
   mpSeed();
   document.getElementById('mpwrap').classList.add('show');
 }
@@ -2597,7 +2630,11 @@ function mpSave(){
   /* SAVING WITH NOTHING FILLED IN MUST LOSE NOTHING. Someone who opens this,
      looks at it and saves is telling us nothing, not telling us they own
      nothing - and the difference is a member whose whole floor turns amber. */
-  if(!dks.length && !box.children.length){closePlayers();return;}
+  if(!dks.length && !box.children.length){
+    closePlayers();
+    mpConfirm("Nothing was listed, so nothing was changed.",false);
+    return;
+  }
   var ord={none:0,unknown:0,dvd:1,bd:2,uhd:3},best="none",i,anyKnown=false;
   for(i=0;i<dks.length;i++){
     if(dks[i].tier==="unknown")continue;
@@ -2611,15 +2648,21 @@ function mpSave(){
           other:(P.other||""),ship:(P.ship||"meet"),src:"self"});
   if(typeof repaintPlay==='function')repaintPlay();
   if(typeof renderFloor==='function')renderFloor();
+  var hw=document.getElementById('hidewrap'); if(hw)hw.style.display="flex";
+  /* SAVE MEANS DONE. The panel closes; the floor repainting behind it is the
+     real confirmation, and the strip at the top of the floor says it in words.
+     The panel used to stay open to offer the tell-the-management link, which
+     kept the floor covered and the text confirmation below the fold - a
+     working Save that READ as a dead button (Jeff, Aug 28). */
+  closePlayers();
   var after=mpSummary(TVprofile()),claim=false;
   for(i=0;i<dks.length;i++){if(dks[i].free||dks[i].tier==="unknown")claim=true;}
   if(after!==MPBEFORE||claim){
-    var a=document.getElementById('mpafter');
-    a.innerHTML="Saved &mdash; the floor has been redrawn. "+
-      (claim?"Some of that the management has to confirm before the floor can promise it. ":"")+
-      '<a href="#" data-mptell="1">Want the management to have this on file?</a>';
-    a.style.display="block";
-  }else{closePlayers();}
+    mpConfirm("Saved \u2014 the floor has been redrawn to what you can play."+
+      (claim?" Some of it the management has to confirm before the floor can promise it.":""),true);
+  }else{
+    mpConfirm("Saved \u2014 nothing changed, so the floor stands as it was.",false);
+  }
 }
 function mpTellText(){
   var P=TVprofile()||{},dks=(P.decks&&typeof P.decks[0]==="object")?P.decks:[],i,out=[];
